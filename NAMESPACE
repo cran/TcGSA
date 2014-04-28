@@ -1,0 +1,19 @@
+importFrom("lme4", lmer)
+import("ggplot2")
+importFrom("GSA", GSA.read.gmt)
+importFrom("multtest", mt.rawp2adjp)
+import("gplots")
+# wapply already loaded in "multtest" 
+# so import("gplots") is incorrect
+importFrom("gtools", mixedorder, invalid)
+import("reshape2")
+import(cluster)
+importFrom("stringr", str_split, str_trim)
+importFrom("splines", ns)
+importFrom("grid", unit)
+
+
+S3method(plot, TcGSA)
+
+exportPattern("^[[:alpha:]]+")
+
