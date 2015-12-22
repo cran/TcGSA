@@ -3,7 +3,7 @@
 #'This function plots graphs informing on the fit of the mixed modeling
 #'of the gene expression performed in TcGSA, for 1 or several gene sets.
 #'
-#'#'@param x a \bold{tcgsa} object for \code{clustTrend}, or a
+#'@param x a \bold{tcgsa} object for \code{clustTrend}, or a
 #'\bold{ClusteredTrends} object for \code{print.ClusteredTrends} and
 #'\code{plot.ClusteredTrends}.
 #'
@@ -58,18 +58,27 @@
 #'
 #'@seealso \code{\link{plot1GS}}, \code{\link{plotSelect.GS}}
 #'
-#'@references Hejblum, B.P., Skinner, J., Thiebaut, R., 2014, TcGSA: a
-#' gene set approach for longitudinal gene expression data analysis, 
-#' \bold{submitted}.
+#'@references Hejblum BP, Skinner J, Thiebaut R, (2015) 
+#'Time-Course Gene Set Analysis for Longitudinal Gene Expression Data. 
+#'\emph{PLoS Computat Biol} 11(6): e1004310.
+#'doi: 10.1371/journal.pcbi.1004310
+#'
+#'@import ggplot2
+#'
+#'@import reshape2
+#'
+#'@importFrom grDevices rgb
+#'
+#'@importFrom stats lm
+#'
+#'@export plotFit.GS
 #'
 #'@examples
-#'
 #'data(data_simu_TcGSA)
 #'
 #'tcgsa_sim_1grp <- TcGSA.LR(expr=expr_1grp, gmt=gmt_sim, design=design, 
 #'                           subject_name="Patient_ID", time_name="TimePoint",
 #'                           time_func="linear", crossedRandom=FALSE)
-#'require(ggplot2)                           
 #'plotFit.GS(x=tcgsa_sim_1grp, expr=expr_1grp, design=design,
 #'					 subject_name="Patient_ID", time_name="TimePoint",
 #'					 colnames_ID="Sample_name", 
@@ -92,10 +101,9 @@
 #'           subject_name="Patient_ID", time_name="TimePoint",
 #'           colnames_ID="Sample_name", 
 #'           plot_type="Histogram Obs", 
-#'           GeneSetsList=c(Gene set 1", "Gene set 2", "Gene set 3",
+#'           GeneSetsList=c("Gene set 1", "Gene set 2", "Gene set 3",
 #'			                "Gene set 4", "Gene set 5"),
 #'           color="genes")
-#'           )
 #'}
 #'
 
@@ -124,14 +132,14 @@ plotFit.GS <- function(x, expr, design, subject_name = "Patient_ID", time_name =
 		rownames(xx) <- select_probe
 		TimePoint <- design$TimePoint
 		Subject_ID <- design$Patient_ID
-		xxx <- melt(xx, varnames=c("Probe_ID", colnames_ID))
+		xxx <- reshape2::melt(xx, varnames=c("Probe_ID", colnames_ID))
 		xxxx <- merge(xxx, design, by=colnames_ID)[, c("Probe_ID", subject_name, time_name, "value")]
 		X <- xxxx[order(xxxx$Probe_ID, xxxx[, subject_name], xxxx[, time_name]),]
 		X$GS <- gs
 		Xfinal <- rbind.data.frame(Xfinal, X)
 		
 		y <- x[["Estimations"]][[interest]]
-		yy <- melt(y, varnames=c("Probe_ID", subject_name, time_name))
+		yy <- reshape2::melt(y, varnames=c("Probe_ID", subject_name, time_name))
 		Y <- yy[order(yy$Probe_ID, yy[ ,subject_name], yy[, time_name]),]
 		Y$GS <- gs
 		Yfinal <- rbind.data.frame(Yfinal, Y)
@@ -237,7 +245,7 @@ plotFit.GS <- function(x, expr, design, subject_name = "Patient_ID", time_name =
 	if(plot_type=="Fit"){
 		p <- p + geom_abline(intercept=0, slope=1, color="black")
 		if(marginal_hist){
-			p <- p + geom_rug(, col=rgb(0,0,0,alpha=.3))
+			p <- p + geom_rug(, col=grDevices::rgb(0,0,0,alpha=.3))
 		}
 	}else if(plot_type=="Residuals Obs" | plot_type=="Residuals Est" ){
 		p <- (p + geom_abline(intercept=0, slope=0, color="red")

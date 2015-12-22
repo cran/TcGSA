@@ -36,14 +36,14 @@
 #'a factor of length \eqn{p} that is in the same order as the
 #'columns of \code{expr} (when it is a dataframe) and that contains the patient
 #'identifier of each sample.
-#'@TODO See Details.
+#TODO See Details.
 #'
 #'@param TimePoint 
 #'a numeric vector or a factor of length \eqn{p} that is in
 #'the same order as \code{TimePoint} and the columns of \code{expr} (when it is
 #'a dataframe), and that contains the time points at which gene expression was
 #'measured.
-#'@TODO See Details.
+#TODO See Details.
 #'
 #'@param geneset.names.select 
 #'a character vector containing the names of the gene sets to
@@ -64,7 +64,7 @@
 #'that can be used as a baseline.  Default is \code{NULL}, in which case no
 #'timepoint is used as a baseline value for gene expression.  Has to be
 #'\code{NULL} when comparing two treatment groups.  
-#'@TODO See Details.
+#TODO See Details.
 #'
 #'@param group.var 
 #'in the case of several treatment groups, this is a factor of
@@ -72,7 +72,7 @@
 #'\code{Subject_ID} and the columns of \code{expr}.  It indicates to which
 #'treatment group each sample belongs to.  Default is \code{NULL}, which means
 #'that there is only one treatment group.  
-#'@TODO See Details.
+#TODO See Details.
 #'
 #'@param Group_ID_paired 
 #'a character vector of length \eqn{p} that is in the
@@ -80,7 +80,7 @@
 #'columns of \code{expr}.  This argument must not be \code{NULL} in the case of
 #'a paired analysis, and must be \code{NULL} otherwise.  Default is
 #'\code{NULL}.  
-#'@TODO See Details.
+#TODO See Details.
 #'
 #'@param ref 
 #'the group which is used as reference in the case of several
@@ -93,7 +93,7 @@
 #'computed in the case of several treatment groups.  Default is \code{NULL},
 #'which means that group of interest is the second group in alphabetical order
 #'of the labels of \code{group.var}.  
-#'@TODO See Details.
+#TODO See Details.
 #'
 #'@param FUNcluster 
 #'a function which accepts as first argument a matrix
@@ -243,12 +243,24 @@
 #'
 #'@author Boris P. Hejblum
 #'
-#'@seealso \code{\link{ggplot2}}, \code{\link[cluster:clusGap]{clusGap}}
+#'@seealso \code{\link[ggplot2:ggplot]{ggplot}}, \code{\link[cluster:clusGap]{clusGap}}
 #'
 #'@references Tibshirani, R., Walther, G. and Hastie, T., 2001, Estimating the
 #'number of data clusters via the Gap statistic, \emph{Journal of the Royal
 #'Statistical Society, Series B (Statistical Methodology)}, \bold{63}, 2:
 #'411--423.
+#'
+#'@import ggplot2
+#'
+#'@import reshape2
+#'
+#'@importFrom cluster agnes
+#'
+#'@importFrom grDevices rainbow
+#'
+#'@importFrom stats cutree
+#'
+#'@export
 #'
 #'@examples
 #'
@@ -316,11 +328,11 @@ plotSelect.GS <-
 			FUNcluster <- switch(EXPR=clustering_metric,
 								 sts= function(x, k, time, ...){
 								 	d <- STSdist(m=x, time = time)
-								 	clus <- cutree(agnes(d, ...), k=k)
+								 	clus <- stats::cutree(agnes(d, ...), k=k)
 								 	return(list("cluster"=clus))
 								 },
 								 function(x, k, ...){
-								 	clus <- cutree(agnes(x, method=clustering_method, metric=clustering_metric, ...), k=k)
+								 	clus <- stats::cutree(agnes(x, method=clustering_method, metric=clustering_metric, ...), k=k)
 								 	return(list("cluster"=clus))
 								 }
 			)
@@ -404,7 +416,7 @@ plotSelect.GS <-
 											  "Cluster"=clust[[gs]], "GS"=rep(gs, dim(data_stand[[gs]])[1]), 
 											  data_stand[[gs]][, sample_sel])
 				colnames(data2melt) <- c("Probe_ID", "Cluster", "GS", TimePoint[sample_sel])
-				melted_temp <- melt(data2melt, id.vars=c("Probe_ID", "Cluster", "GS"), 
+				melted_temp <- reshape2::melt(data2melt, id.vars=c("Probe_ID", "Cluster", "GS"), 
 									variable.name="TimePoint")
 				meltedData <- rbind(meltedData, melted_temp)
 				subj_temp <- c(subj_temp, rep(p, dim(melted_temp)[1]))
@@ -462,14 +474,15 @@ plotSelect.GS <-
 			for (gs in geneset.names.select){
 				meltedData2plot <- meltedData[which(meltedData$GS==gs),]
 				p <- (ggplot(meltedData2plot, aes_string(x="TimePoint", y="value")) 
-					  + geom_hline(aes(y = 0), linetype=1, colour='grey50', size=0.4)
+					  + geom_hline(aes(yintercept = 0), linetype=1, colour='grey50', size=0.4)
 					  + facet_wrap( ~Subject_ID, ncol=floor(sqrt(length(unique(meltedData$Subject_ID)))))
 				)
 				
 				if(!clustering){
 					p <- (p
 						  + geom_line(aes_string(group="Probe_ID", colour="Probe_ID"), size=0.7)
-						  + scale_colour_manual(guide='none', name='probe ID', values=rainbow(length(select_probe)))
+						  + scale_colour_manual(guide='none', name='probe ID', 
+						  					  values=grDevices::rainbow(length(select_probe)))
 					)
 				}else{
 					p <- (p
@@ -531,7 +544,8 @@ plotSelect.GS <-
 				if(!clustering){
 					p <- (p
 						  + geom_line(aes_string(group="Probe_ID", colour="Probe_ID"), size=0.7)
-						  + scale_colour_manual(guide='none', name='probe ID', values=rainbow(length(select_probe)))
+						  + scale_colour_manual(guide='none', name='probe ID', 
+						  					  values=grDevices::rainbow(length(select_probe)))
 					)
 				}else{
 					p <- (p

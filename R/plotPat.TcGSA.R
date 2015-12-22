@@ -62,19 +62,19 @@
 #'a factor of length \eqn{p} that is in the same order as the
 #'columns of \code{expr} (when it is a dataframe) and that contains the patient
 #'identifier of each sample.
-#'@TODO See Details.
+#TODO See Details.
 #'
 #'@param TimePoint 
 #'a numeric vector or a factor of length \eqn{p} that is in
 #'the same order as \code{Subject_ID} and the columns of \code{expr} (when it
 #'is a dataframe), and that contains the time points at which gene expression
 #'was measured.
-#'@TODO See Details.
+#TODO See Details.
 #'
 #'@param baseline 
 #'a character string which is the value of \code{TimePoint}
 #'used as baseline.  
-#'@TODO See Details.
+#TODO See Details.
 #'
 #'@param only.signif 
 #'logical flag for plotting only the significant gene sets.
@@ -93,7 +93,7 @@
 #'\code{group.var} and the columns of \code{expr}.  This argument must not be
 #'\code{NULL} in the case of a paired analysis, and must be \code{NULL}
 #'otherwise.  Default is \code{NULL}.  
-#'@TODO See Details.
+#TODO See Details.
 #'
 #'@param ref 
 #'the group which is used as reference in the case of several
@@ -106,7 +106,7 @@
 #'computed in the case of several treatment groups.  Default is \code{NULL},
 #'which means that group of interest is the second group in alphabetical order
 #'of the labels of \code{group.var}.  
-#'@TODO See Details.
+#TODO See Details.
 #'
 #'@param FUNcluster 
 #'the clustering function used to agglomerate genes in
@@ -174,7 +174,7 @@
 #'a character vector of colors for predefined clusters of the
 #'represented genesets, with as many levels as the value of \code{N_clusters}.
 #'Default is \code{NULL}, in which case the clusters are automatically
-#'identified and colored via the \code{\link{cutree}} function and the
+#'identified and colored via the \code{\link[stats:cutree]{cutree}} function and the
 #'\code{N_clusters} argument only.
 #'
 #'@param label.clusters 
@@ -184,7 +184,7 @@
 #'numbers.
 #'
 #'@param prev_rowCL 
-#'a \bold{hclust} object, such as the one return by the
+#'a \bold{\link[stats:hclust]{hclust}} object, such as the one return by the
 #'present plotting funstion (see Value) for instance.  If not \code{NULL}, no
 #'clustering is calculated by the present plotting function and this tree is
 #'used to represent the gene sets dynamics.  Default is \code{NULL}.
@@ -270,7 +270,7 @@
 #'@param \dots 
 #'other parameters to be passed through to plotting functions.
 #'
-#'@return An object of class \bold{\link{hclust}} which describes the tree
+#'@return An object of class \bold{\link[stats:hclust]{hclust}} which describes the tree
 #'produced by the clustering process.  The object is a list with components:
 #'\itemize{
 	#'\item merge an \eqn{n-1} by \eqn{2} matrix.  Row \eqn{i} of
@@ -300,7 +300,7 @@
 	#'represented genesets, with as many levels as the value of \code{N_clusters}.
 	#'If no clusters were represented, than this is \code{NULL}.
 	#'\item ddr a \bold{dendrogram} object with the reordering used for the
-	#'heatmap.  See \code{\link{heatmap.2}}.
+	#'heatmap.  See \code{\link[gplots:heatmap.2]{heatmap.2}}.
 	#'\item clustersExport a data frame with 2 variables containing the two
 	#'following variables : \itemize{ \item \code{GeneSet}: the gene sets
 	#'clustered.  \item \code{Cluster}: the cluster they belong to.  } The data
@@ -310,9 +310,18 @@
 #'@author Boris P. Hejblum
 #'
 #'@seealso \code{\link{plot.TcGSA}}, \code{\link[gplots:heatmap.2]{heatmap.2}},
-#'\code{\link{TcGSA.LR}}, \code{\link{hclust}}
+#'\code{\link{TcGSA.LR}}, \code{\link[stats:hclust]{hclust}}
 #'
-#'@references Hejblum, B.P., Skinner, J., Thiebaut, R., 2014, TcGSA: a gene set approach for longitudinal gene expression data analysis, \bold{submitted}.
+#'@references Hejblum BP, Skinner J, Thiebaut R, (2015) 
+#'Time-Course Gene Set Analysis for Longitudinal Gene Expression Data. 
+#'\emph{PLoS Computat Biol} 11(6): e1004310.
+#'doi: 10.1371/journal.pcbi.1004310
+#'
+#'@import ggplot2
+#'
+#'@importFrom stats as.dendrogram
+#'
+#'@export plotPat.TcGSA
 #'
 #'@examples
 #'
@@ -358,7 +367,6 @@ function(x, threshold=0.05, myproc="BY", nbsimu_pval=1e+06,
          main=NULL, subtitle=NULL, 
          ...){
   
-#  library(gplots)
   cat("NOT IMPLEMENTED YET")
 	
 if(FALSE){
@@ -435,7 +443,7 @@ if(FALSE){
     if(!is.null(prev_rowCL$ddr)){
       clRows=prev_rowCL$ddr
     }else{
-      clRows=as.dendrogram(prev_rowCL)
+      clRows=stats::as.dendrogram(prev_rowCL)
     }
     
     select <- match(prev_rowCL$labels, gmt$geneset.names)

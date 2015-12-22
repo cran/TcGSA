@@ -64,7 +64,16 @@
 #'
 #'@seealso \code{\link{multtest.TcGSA}}, \code{\link{TcGSA.LR}}
 #'
-#'@references Hejblum, B.P., Skinner, J., Thiebaut, R., 2014, TcGSA: a gene set approach for longitudinal gene expression data analysis, \bold{submitted}.
+#'@references Hejblum BP, Skinner J, Thiebaut R, (2015) 
+#'Time-Course Gene Set Analysis for Longitudinal Gene Expression Data. 
+#'\emph{PLoS Computat Biol} 11(6): e1004310.
+#'doi: 10.1371/journal.pcbi.1004310
+#'
+#'@importFrom gtools mixedorder
+#'
+#'@importFrom utils write.table
+#'
+#'@export signifLRT.TcGSA
 #'
 #'@examples
 #'
@@ -107,7 +116,7 @@ function(tcgsa, threshold=0.05, myproc="BY", nbsimu_pval = 1e+06, write=F, txtfi
         directory <- getwd()
         cat("Warning: 'directory' argument is empty, output file written in the current working directory")
       }
-      write.table(Res_Linear_Mod_FDR, file=paste(directory, txtfilename, sep="/"), row.names=FALSE, sep="\t")
+      utils::write.table(Res_Linear_Mod_FDR, file=paste(directory, txtfilename, sep="/"), row.names=FALSE, sep="\t")
     }else{
       cat("ERROR: could not write the significant results file because the argument 'txtfilename' is empty")
     }

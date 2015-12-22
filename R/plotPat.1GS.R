@@ -36,14 +36,14 @@
 #'a factor of length \eqn{p} that is in the same order as the
 #'columns of \code{expr} (when it is a dataframe) and that contains the patient
 #'identifier of each sample.
-#'@TODO See Details.
+#TODO See Details.
 #'
 #'@param TimePoint 
 #'a numeric vector or a factor of length \eqn{p} that is in
 #'the same order as \code{TimePoint} and the columns of \code{expr} (when it is
 #'a dataframe), and that contains the time points at which gene expression was
 #'measured.
-#'@TODO See Details.
+#TODO See Details.
 #'
 #'@param geneset.name 
 #'a character string containing the name of the gene set to
@@ -55,7 +55,7 @@
 #'that can be used as a baseline.  Default is \code{NULL}, in which case no
 #'timepoint is used as a baseline value for gene expression.  Has to be
 #'\code{NULL} when comparing two treatment groups.  
-#'@TODO See Details.
+#TODO See Details.
 #'
 #'@param group.var 
 #'in the case of several treatment groups, this is a factor of
@@ -70,7 +70,7 @@
 #'columns of \code{expr}.  This argument must not be \code{NULL} in the case of
 #'a paired analysis, and must be \code{NULL} otherwise.  Default is
 #'\code{NULL}.  
-#'@TODO See Details.
+#TODO See Details.
 #'
 #'@param ref 
 #'the group which is used as reference in the case of several
@@ -83,7 +83,7 @@
 #'computed in the case of several treatment groups.  Default is \code{NULL},
 #'which means that group of interest is the second group in alphabetical order
 #'of the labels of \code{group.var}.  
-#'@TODO See Details.
+#TODO See Details.
 #'
 #'@param FUNcluster 
 #'a function which accepts as first argument a matrix
@@ -233,12 +233,22 @@
 #'
 #'@author Boris P. Hejblum
 #'
-#'@seealso \code{\link{ggplot2}}, \code{\link[cluster:clusGap]{clusGap}}
+#'@seealso \code{\link[ggplot2:ggplot]{ggplot}}, \code{\link[cluster:clusGap]{clusGap}}
 #'
 #'@references Tibshirani, R., Walther, G. and Hastie, T., 2001, Estimating the
 #'number of data clusters via the Gap statistic, \emph{Journal of the Royal
 #'Statistical Society, Series B (Statistical Methodology)}, \bold{63}, 2:
 #'411--423.
+#'
+#'@import ggplot2
+#'
+#'@importFrom cluster agnes
+#'
+#'@importFrom grDevices rainbow
+#'
+#'@importFrom stats cutree
+#'
+#'@export
 #'
 #'@examples
 #'
@@ -282,7 +292,6 @@
 #')
 #'par(op)
 #'
-#'require(ggplot2)
 #'plotPat.1GS(expr=expr_1grp, TimePoint=design$TimePoint, 
 #'        Subject_ID=design$Patient_ID, gmt=gmt_sim,
 #'        geneset.name="Gene set 5",
@@ -319,9 +328,6 @@ plotPat.1GS <-
 			 gg.add=list(theme())
 	){
 		
-		#   library(ggplot2)
-		#   library(cluster)
-		#   library(splines)
 		capwords <- function(s, strict = FALSE){
 			cap <- function(s){
 				paste(toupper(substring(s,1,1)),{s <- substring(s,2); if(strict) tolower(s) else s},
@@ -338,11 +344,11 @@ plotPat.1GS <-
 			FUNcluster <- switch(EXPR=clustering_metric,
 								 sts= function(x, k, time, ...){
 								 	d <- STSdist(m=x, time = time)
-								 	clus <- cutree(agnes(d, ...), k=k)
+								 	clus <- stats::cutree(agnes(d, ...), k=k)
 								 	return(list("cluster"=clus))
 								 },
 								 function(x, k, ...){
-								 	clus <- cutree(agnes(x, method=clustering_method, metric=clustering_metric, ...), k=k)
+								 	clus <- stats::cutree(agnes(x, method=clustering_method, metric=clustering_metric, ...), k=k)
 								 	return(list("cluster"=clus))
 								 }
 			)
@@ -395,18 +401,20 @@ plotPat.1GS <-
 			Subject_ID <- rep(dimnames(expr_sel)[[2]], dim(expr_sel)[3])
 		}
 		
-		all_clust <- plot1GS(expr, gmt, Subject_ID,TimePoint, geneset.name, 
-							 baseline, group.var, Group_ID_paired, ref, group_of_interest,
+		all_clust <- plot1GS(expr, gmt, Subject_ID, TimePoint, geneset.name, 
+							 baseline, 
+							 group.var, Group_ID_paired, ref, group_of_interest,
 							 FUNcluster, clustering_metric, clustering_method, B,
 							 max_trends, aggreg.fun, trend.fun,
 							 methodOptiClust,
 							 indiv="genes",
 							 verbose,
-							 clustering, showTrend=FALSE, smooth=FALSE,
-							 time_unit, title, y.lab, desc,
+							 clustering, showTrend=FALSE, smooth=FALSE, precluster=NULL,
+							 time_unit, title, y.lab, desc, margins=1, line.size=1,
 							 lab.cex, axis.cex, main.cex, y.lab.angle, x.axis.angle,
 							 y.lim, x.lim, 
-							 gg.add, plot=FALSE)
+							 gg.add, 
+							 plot=FALSE)
 		data_stand <- t(apply(X=data_sel, MARGIN=1, FUN=scale))
 		
 		if(!is.null(baseline)){
@@ -457,14 +465,15 @@ plotPat.1GS <-
 			x.lim <- unique(meltedData$TimePoint)
 		}
 		p <- (ggplot(meltedData, aes_string(x="TimePoint", y="value")) 
-			  + geom_hline(aes(y = 0), linetype=1, colour='grey50', size=0.4)
+			  + geom_hline(aes(yintercept = 0), linetype=1, colour='grey50', size=0.4)
 			  + facet_wrap( ~Subject_ID, ncol=floor(sqrt(length(unique(meltedData$Subject_ID)))))
 		)
 		
 		if(!clustering){
 			p <- (p
 				  + geom_line(aes_string(group="Probe_ID", colour="Probe_ID"), size=0.7)
-				  + scale_colour_manual(guide='none', name='probe ID', values=rainbow(length(select_probe)))
+				  + scale_colour_manual(guide='none', name='probe ID', 
+				  					  values=grDevices::rainbow(length(select_probe)))
 			)
 		}else{
 			p <- (p

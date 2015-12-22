@@ -147,7 +147,18 @@
 #'
 #'@seealso \code{\link{summary.TcGSA}}, \code{\link{plot.TcGSA}}
 #'
-#'@references Hejblum, B.P., Skinner, J., Thiebaut, R., 2014, TcGSA: a gene set approach for longitudinal gene expression data analysis, \bold{submitted}.
+#'@references Hejblum BP, Skinner J, Thiebaut R, (2015) 
+#'Time-Course Gene Set Analysis for Longitudinal Gene Expression Data. 
+#'\emph{PLoS Computat Biol} 11(6): e1004310.
+#'doi: 10.1371/journal.pcbi.1004310
+#'
+#'@importFrom GSA GSA.read.gmt
+#'
+#'@importFrom lme4 lmer
+#'
+#'@importFrom stats as.formula deviance fitted
+#'
+#'@export TcGSA.LR.parallel
 #'
 #'@examples
 #'
@@ -158,7 +169,7 @@
 #'                           time_func="linear", crossedRandom=FALSE)
 #'                           
 #'\dontrun{ 
-#'require(doSNOW)
+#'require(doParallel)
 #'tcgsa_sim_1grp <- TcGSA.LR.parallel(Ncpus = 2, type_connec = 'SOCK',
 #'                             expr=expr_1grp, gmt=gmt_sim, design=design, 
 #'                             subject_name="Patient_ID", time_name="TimePoint",
@@ -173,140 +184,135 @@
 
 TcGSA.LR.parallel <-
 	function(Ncpus, type_connec, 
-					 expr, gmt, design, subject_name="Patient_ID", time_name="TimePoint", crossedRandom=FALSE,
-					 covariates_fixed="", time_covariates="",
-					 time_func = "linear", group_name="", separateSubjects=FALSE,
-					 minGSsize=10, maxGSsize=500,
-					 monitorfile=""){
-		
-		library(doSNOW)
-		
-		if(group_name!="" && separateSubjects){
-			stop("'separateSubjects' is TRUE while 'group_name' is not \"\".\n This is an attempt to separate subjects in a multiple group setting.\n This is not handled by the TcGSA.LR function.\n\n")
-		}
-		
-		#   library(GSA)
-		#   library(lme4)
-		#   library(reshape2)
-		#   require(splines)
-		
-		my_formul <- TcGSA.formula(design=design, subject_name=subject_name, time_name=time_name,  
-															 covariates_fixed=covariates_fixed, time_covariates=time_covariates, group_name=group_name,
-															 separateSubjects=separateSubjects, crossedRandom=crossedRandom,
-															 time_func=time_func)
-		time_DF <- my_formul[["time_DF"]]
-		
-		
-		
-		cl <- makeCluster(Ncpus, type = type_connec)
-		registerDoSNOW(cl)
-		
-		res_par <- foreach(gs=1:length(gmt$genesets), .packages=c("lme4", "reshape2", "splines"), .export=c("TcGSA.dataLME")) %dopar% {
-			probes <- intersect(gmt$genesets[[gs]], rownames(expr))
+			 expr, gmt, design, subject_name="Patient_ID", time_name="TimePoint", crossedRandom=FALSE,
+			 covariates_fixed="", time_covariates="",
+			 time_func = "linear", group_name="", separateSubjects=FALSE,
+			 minGSsize=10, maxGSsize=500,
+			 monitorfile=""){
+		if (requireNamespace("doParallel", quietly = TRUE)) {
+			requireNamespace("doParallel")
+			if(group_name!="" && separateSubjects){
+				stop("'separateSubjects' is TRUE while 'group_name' is not \"\".\n This is an attempt to separate subjects in a multiple group setting.\n This is not handled by the TcGSA.LR function.\n\n")
+			}
 			
-			if(length(probes)>0 && length(probes)<=maxGSsize && length(probes)>=minGSsize){                                                       
-				expr_temp <- t(expr[probes, ])
-				rownames(expr_temp) <- NULL
-				data_lme  <- TcGSA.dataLME(expr=expr_temp, design=design, subject_name=subject_name, time_name=time_name, 
-																	 covariates_fixed=covariates_fixed, time_covariates=time_covariates,
-																	 group_name=group_name, time_func=time_func)
+			my_formul <- TcGSA.formula(design=design, subject_name=subject_name, time_name=time_name,  
+									   covariates_fixed=covariates_fixed, time_covariates=time_covariates, group_name=group_name,
+									   separateSubjects=separateSubjects, crossedRandom=crossedRandom,
+									   time_func=time_func)
+			time_DF <- my_formul[["time_DF"]]
+			
+			
+			cl <- parallel::makeCluster(Ncpus, type = type_connec)
+			doParallel::registerDoParallel(cl)
+			
+			
+			gs <- NULL # This is just to prevent R CMD check to issue a NOTE reanding "TcGSA.LR.parallel: no visible binding for global variable 'gs'". It is extremely ANNOYING !
+			res_par <- foreach::"%dopar%"(foreach::foreach(gs=1:length(gmt$genesets), .packages=c("lme4", "reshape2", "splines"), .export=c("TcGSA.dataLME")),
+										  {
+				probes <- intersect(gmt$genesets[[gs]], rownames(expr))
 				
-				if(length(levels(data_lme$probe))>1){
-					lmm_H0 <- tryCatch(lmer(formula =my_formul[["H0"]]["reg"], REML=FALSE, data=data_lme),
-														 error=function(e){NULL})
-					lmm_H1 <- tryCatch(lmer(formula =my_formul[["H1"]]["reg"], REML=FALSE, data=data_lme),
-														 error=function(e){NULL})
+				if(length(probes)>0 && length(probes)<=maxGSsize && length(probes)>=minGSsize){                                                       
+					expr_temp <- t(expr[probes, ])
+					rownames(expr_temp) <- NULL
+					data_lme  <- TcGSA.dataLME(expr=expr_temp, design=design, subject_name=subject_name, time_name=time_name, 
+											   covariates_fixed=covariates_fixed, time_covariates=time_covariates,
+											   group_name=group_name, time_func=time_func)
+					
+					if(length(levels(data_lme$probe))>1){
+						lmm_H0 <- tryCatch(lmer(formula =my_formul[["H0"]]["reg"], REML=FALSE, data=data_lme),
+										   error=function(e){NULL})
+						lmm_H1 <- tryCatch(lmer(formula =my_formul[["H1"]]["reg"], REML=FALSE, data=data_lme),
+										   error=function(e){NULL})
+					}
+					else{
+						lmm_H0 <- tryCatch(lmer(formula =my_formul[["H0"]]["1probe"], REML=FALSE, data=data_lme),
+										   error=function(e){NULL})
+						lmm_H1 <- tryCatch(lmer(formula =my_formul[["H1"]]["1probe"], REML=FALSE, data=data_lme),
+										   error=function(e){NULL})
+					}
+					
+					if (!is.null(lmm_H0) & !is.null(lmm_H1)) {
+						LR <- stats::deviance(lmm_H0, REML=FALSE) - stats::deviance(lmm_H1, REML=FALSE)
+						CVG_H0 <- lmm_H0@optinfo[["conv"]]$opt
+						CVG_H1 <- lmm_H1@optinfo[["conv"]]$opt
+						
+						estims <- cbind.data.frame(data_lme, "fitted"=stats::fitted(lmm_H1))
+						estims_tab <- reshape2::acast(data=estims, formula = stats::as.formula(paste("probe", subject_name, "t1", sep="~")), value.var="fitted")
+						# drop = FALSE by default, which means that missing combination will be kept in the estims_tab and filled with NA
+						dimnames(estims_tab)[[3]] <- as.numeric(dimnames(estims_tab)[[3]])*10
+						estim_expr <- estims_tab
+					} 
+					else {
+						LR <- NA
+						CVG_H0 <- NA
+						CVG_H1 <- NA
+						
+						estims <- cbind.data.frame(data_lme, "fitted"=NA)
+						estims_tab <- reshape2::acast(data=estims, formula = stats::as.formula(paste("probe", subject_name, "t1", sep="~")), value.var="fitted")
+						dimnames(estims_tab)[[3]] <- as.numeric(dimnames(estims_tab)[[3]])*10
+						estim_expr <- estims_tab
+						cat("Unable to fit the mixed models for this gene set\n")
+					}
+					
+
+					# CONVERGENCE DIAGNOSTICS IN lme4 v1.1-7 (from Nelder Mead optimizer)
+					# -3: "nm_forced"
+					# -2: "cannot generate a feasible simplex"
+					# -1: "initial x is not feasible"
+					#  0: "converged"
+					
 				}
 				else{
-					lmm_H0 <- tryCatch(lmer(formula =my_formul[["H0"]]["1probe"], REML=FALSE, data=data_lme),
-														 error=function(e){NULL})
-					lmm_H1 <- tryCatch(lmer(formula =my_formul[["H1"]]["1probe"], REML=FALSE, data=data_lme),
-														 error=function(e){NULL})
-				}
-				
-				if (!is.null(lmm_H0) & !is.null(lmm_H1)) {
-					LR <- deviance(lmm_H0, REML=FALSE) - deviance(lmm_H1, REML=FALSE)
-					CVG_H0 <- lmm_H0@optinfo["conv"]
-					CVG_H1 <- lmm_H1@optinfo["conv"]
-					
-					estims <- cbind.data.frame(data_lme, "fitted"=fitted(lmm_H1))
-					estims_tab <- acast(data=estims, formula = as.formula(paste("probe", subject_name, "t1", sep="~")), value.var="fitted")
-					# drop = FALSE by default, which means that missing combination will be kept in the estims_tab and filled with NA
-					dimnames(estims_tab)[[3]] <- as.numeric(dimnames(estims_tab)[[3]])*10
-					estim_expr <- estims_tab
-				} 
-				else {
 					LR <- NA
 					CVG_H0 <- NA
 					CVG_H1 <- NA
 					
-					estims <- cbind.data.frame(data_lme, "fitted"=NA)
-					estims_tab <- acast(data=estims, formula = as.formula(paste("probe", subject_name, "t1", sep="~")), value.var="fitted")
-					dimnames(estims_tab)[[3]] <- as.numeric(dimnames(estims_tab)[[3]])*10
-					estim_expr <- estims_tab
-					cat("Unable to fit the mixed models for this gene set\n")
+					estim_expr <- NA
+					cat("The size of the gene set",  gmt$geneset.names[[gs]], "is problematic (too many or too few genes)\n")
 				}
 				
-				#		CONVERGENCE DIAGNOSTICS IN LME4
-				#       "3" = "X-convergence (3)",
-				#       "4" = "relative convergence (4)",
-				#       "5" = "both X-convergence and relative convergence (5)",
-				#       "6" = "absolute function convergence (6)",
-				# 
-				#       "7" = "singular convergence (7)",
-				#       "8" = "false convergence (8)",
-				#       "9" = "function evaluation limit reached without convergence (9)",
-				#       "10" = "iteration limit reached without convergence (9)",
-				#       "14" = "storage has been allocated (?) (14)",
-				# 
-				#       "15" = "LIV too small (15)",
-				#       "16" = "LV too small (16)",
-				#       "63" = "fn cannot be computed at initial par (63)",
-				#       "65" = "gr cannot be computed at initial par (65)")
-				#
+				line_number <- 0
+				try(line_number <- length(readLines(monitorfile)), silent=TRUE)
+				cat(paste(line_number+1,"/", length(gmt$genesets)," gene sets analyzed (geneset ", gs, ")\n", sep=""), file=monitorfile, append = TRUE)
 				
-			}
-			else{
-				LR <- NA
-				CVG_H0 <- NA
-				CVG_H1 <- NA
-        
-				estim_expr <- NA
-				cat("The size of the gene set",  gmt$geneset.names[[gs]], "is problematic (too many or too few genes)\n")
+				res <- list("LR"=LR, "CVG_H0"=CVG_H0, "CVG_H1"=CVG_H1, "estim_expr"=estim_expr)
+			})
+			
+			
+			cat("Combining the results...")
+			
+			LR <- sapply(res_par, "[[", "LR") #res_par[[gs]][["LR"]]
+			CVG_H0 <- sapply(res_par, "[[", "CVG_H0") #res_par[[gs]][["CVG_H0"]]
+			CVG_H1 <- sapply(res_par, "[[", "CVG_H1") #res_par[[gs]][["CVG_H1"]]
+			estim_expr <- lapply(res_par, "[[", "estim_expr") #res_par[[gs]][["estim_expr"]]
+			
+			# LR <- numeric(length(gmt$genesets))
+			# CVG_H0 <- numeric(length(gmt$genesets))
+			# CVG_H1 <- numeric(length(gmt$genesets))
+			# estim_expr <- list()
+			# for (gs in 1:length(gmt$genesets)){
+			# 	LR[gs] <- res_par[[gs]][["LR"]]
+			# 	CVG_H0[gs] <- res_par[[gs]][["CVG_H0"]]
+			# 	CVG_H1[gs] <- res_par[[gs]][["CVG_H1"]]
+			# 	estim_expr[[gs]] <- res_par[[gs]][["estim_expr"]]
+			# }
+			
+			if(group_name==""){
+				gv <- NULL
+			} else{
+				gv <- design[,group_name]
 			}
 			
-			line_number <- 0
-			try(line_number <- length(readLines(monitorfile)), silent=TRUE)
-			cat(paste(line_number+1,"/", length(gmt$genesets)," gene sets analyzed (geneset ", gs, ")\n", sep=""), file=monitorfile, append = TRUE)
+			tcgsa <- list("fit"=as.data.frame(cbind(LR, CVG_H0, CVG_H1)), "time_func"=time_func, "GeneSets_gmt"=gmt, 
+						  "group.var"=gv, "separateSubjects"=separateSubjects, "Estimations"=estim_expr, 
+						  "time_DF"=time_DF
+			)
+			class(tcgsa) <- "TcGSA"
+			parallel::stopCluster(cl)
 			
-			res <- list("LR"=LR, "CVG_H0"=CVG_H0, "CVG_H1"=CVG_H1, "estim_expr"=estim_expr)
+		} else {
+			stop("Package 'doParallel' is not available.\n  -> Try running 'install.packages(\"doParallel\")'\n   or use non parallel version of the function: 'TcGSA.LR'")
 		}
-		
-		LR <- numeric(length(gmt$genesets))
-		CVG_H0 <- numeric(length(gmt$genesets))
-		CVG_H1 <- numeric(length(gmt$genesets))
-		estim_expr <- list()
-		
-		cat("Combining the results...")
-		for (gs in 1:length(gmt$genesets)){
-			LR[gs] <- res_par[[gs]][["LR"]]
-			CVG_H0[gs] <- res_par[[gs]][["CVG_H0"]]
-			CVG_H1[gs] <- res_par[[gs]][["CVG_H1"]]
-			estim_expr[[gs]] <- res_par[[gs]][["estim_expr"]]
-		}
-		
-		if(group_name==""){
-			gv <- NULL
-		} else{
-			gv <- design[,group_name]
-		}
-		
-		tcgsa <- list("fit"=as.data.frame(cbind(LR, CVG_H0, CVG_H1)), "time_func"=time_func, "GeneSets_gmt"=gmt, 
-									"group.var"=gv, "separateSubjects"=separateSubjects, "Estimations"=estim_expr, 
-									"time_DF"=time_DF
-		)
-		class(tcgsa) <- "TcGSA"
-		stopCluster(cl)
 		
 		return(tcgsa)
 	}

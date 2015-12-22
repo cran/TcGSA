@@ -17,7 +17,7 @@
 #'@aliases clustTrend ClusteredTrends print.ClusteredTrends
 #'plot.ClusteredTrends
 #'
-#'@param x a \bold{tcgsa} object for \code{clustTrend}, or a
+#'@param tcgs a \bold{tcgsa} object for \code{clustTrend}, or a
 #'\bold{ClusteredTrends} object for \code{print.ClusteredTrends} and
 #'\code{plot.ClusteredTrends}.
 #'
@@ -35,20 +35,20 @@
 #'a factor of length \eqn{p} that is in the same order as the
 #'columns of \code{expr} (when it is a dataframe) and that contains the patient
 #'identifier of each sample. 
-#'@TODO See Details.
+#TODO See Details.
 #'
 #'@param TimePoint 
 #'a numeric vector or a factor of length \eqn{p} that is in
 #'the same order as \code{Subject_ID} and the columns of \code{expr} (when it
 #'is a dataframe), and that contains the time points at which gene expression
 #'was measured. 
-#'@TODO See Details.
+#TODO See Details.
 #'
 #'@param threshold 
 #'the threshold at which the FDR or the FWER should be
 #'controlled.
 #'
-#'#'@param myproc 
+#'@param myproc 
 #'a vector of character strings containing the names of the
 #'multiple testing procedures for which adjusted p-values are to be computed.
 #'This vector should include any of the following: "\code{Bonferroni}",
@@ -70,7 +70,7 @@
 #'that can be used as a baseline.  Default is \code{NULL}, in which case no
 #'timepoint is used as a baseline value for gene expression.  Has to be
 #'\code{NULL} when comparing two treatment groups.
-#'@TODO See Details.
+#TODO See Details.
 #'
 #'@param only.signif 
 #'logical flag for analysing the trends in only the
@@ -84,7 +84,7 @@
 #'\code{Subject_ID} and the columns of \code{expr}.  It indicates to which
 #'treatment group each sample belongs to.  Default is \code{NULL}, which means
 #'that there is only one treatment group.
-#'@TODO See Details.
+#TODO See Details.
 #'
 #'@param Group_ID_paired 
 #'a character vector of length \eqn{p} that is in the
@@ -92,20 +92,20 @@
 #'columns of \code{expr}.  This argument must not be \code{NULL} in the case of
 #'a paired analysis, and must be \code{NULL} otherwise.  Default is
 #'\code{NULL}.
-#'@TODO See Details.
+#TODO See Details.
 #'
 #'@param ref 
 #'the group which is used as reference in the case of several
 #'treatment groups.  Default is \code{NULL}, which means that reference is the
 #'first group in alphabetical order of the labels of \code{group.var}.
-#'@TODO See Details.
+#TODO See Details.
 #'
 #'@param group_of_interest 
 #'the group of interest, for which dynamics are to be
 #'computed in the case of several treatment groups.  Default is \code{NULL},
 #'which means that group of interest is the second group in alphabetical order
 #'of the labels of \code{group.var}.
-#'@TODO See Details.
+#TODO See Details.
 #'
 #'@param FUNcluster 
 #'the clustering function used to agglomerate genes in
@@ -200,6 +200,16 @@
 #'Statistical Society, Series B (Statistical Methodology)}, \bold{63}, 2:
 #'41--423.
 #'
+#'@importFrom cluster agnes clusGap maxSE
+#'
+#'@importFrom graphics barplot
+#'
+#'@importFrom grDevices rainbow
+#'
+#'@importFrom stats cutree var
+#'
+#'@export
+#'
 #'@examples
 #'
 #'data(data_simu_TcGSA)
@@ -223,7 +233,7 @@
 
 
 clustTrend <- 
-	function(x,
+	function(tcgs,
 			 expr, Subject_ID, TimePoint, threshold = 0.05, 
 			 myproc = "BY", nbsimu_pval = 1e+06, baseline=NULL, 
 			 only.signif=TRUE, group.var=NULL, Group_ID_paired=NULL, 
@@ -233,7 +243,6 @@ clustTrend <-
 			 trend.fun="median", methodOptiClust = "firstSEmax",
 			 indiv="genes", verbose=TRUE
 	){
-		#  library(cluster)
 		
 		
 		Fun_byIndex<-function(X, index, fun, ...){
@@ -244,11 +253,11 @@ clustTrend <-
 			FUNcluster <- switch(EXPR=clustering_metric,
 								 sts= function(x, k, time, ...){
 								 	d <- STSdist(m=x, time = time)
-								 	clus <- cutree(agnes(d, ...), k=k)
+								 	clus <- stats::cutree(agnes(d, ...), k=k)
 								 	return(list("cluster"=clus))
 								 },
 								 function(x, k, ...){
-								 	clus <- cutree(agnes(x, method=clustering_method, metric=clustering_metric, ...), k=k)
+								 	clus <- stats::cutree(agnes(x, method=clustering_method, metric=clustering_metric, ...), k=k)
 								 	return(list("cluster"=clus))
 								 }
 			)
@@ -262,10 +271,10 @@ clustTrend <-
 			stop("the 'FUNcluster' supplied is not a function")
 		}
 		
-		gmt <- x[["GeneSets_gmt"]]
-		separateSubjects <- x[["separateSubjects"]]
+		gmt <- tcgs[["GeneSets_gmt"]]
+		separateSubjects <- tcgs[["separateSubjects"]]
 		if(only.signif){
-			GSsig <- signifLRT.TcGSA(tcgsa=x, threshold=threshold, myproc = "BY", nbsimu_pval = 1e+06)$mixedLRTadjRes
+			GSsig <- signifLRT.TcGSA(tcgsa=tcgs, threshold=threshold, myproc = "BY", nbsimu_pval = 1e+06)$mixedLRTadjRes
 			GeneSetsList <- GSsig$GeneSet
 			if(length(GeneSetsList)<1){
 				stop("NO SIGNIFICANT GENE SETS\n No gene sets to be plotted: set 'only.signif' argument to 'FALSE' in order to plot all the investigated gene sets")
@@ -418,9 +427,15 @@ clustTrend <-
 
 
 #'@rdname clustTrend
-#'@method print ClusteredTrends
+#'
+#'@param x an object of class '\code{ClusteredTrends}'.
 #'
 #'@param \dots further arguments passed to or from other methods.
+#'
+#'@method print ClusteredTrends
+#'
+#'@export
+#'
 #'
 print.ClusteredTrends <- function(x, ...){
 	maxK <- x$MaxNbClust
@@ -451,15 +466,18 @@ print.ClusteredTrends <- function(x, ...){
 
 
 #'@rdname clustTrend
+#'
 #'@method plot ClusteredTrends
+#'
+#'@export
 #'
 plot.ClusteredTrends <- function(x, ...){
 	maxK <- x$MaxNbClust
 	f <- factor(x$NbClust, levels=c(1:maxK))
-	barplot(height=summary(f),
-			xlab="Number of distinct trends", ylab= "Number of gene sets",
-			col=rainbow(maxK),
-			main=paste(formatC(mean(x$NbClust), digits=3), "trends by significant gene set (on average)"),
-			ylim=c(0, sum(summary(f)))  				
+	graphics::barplot(height=summary(f),
+					  xlab="Number of distinct trends", ylab= "Number of gene sets",
+					  col=grDevices::rainbow(maxK),
+					  main=paste(formatC(mean(x$NbClust), digits=3), "trends by significant gene set (on average)"),
+					  ylim=c(0, sum(summary(f)))  				
 	)      
 }
