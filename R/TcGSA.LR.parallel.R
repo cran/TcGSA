@@ -21,7 +21,7 @@
 #'
 #'@aliases TcGSA.LR.parallel
 #'
-#'@param Ncpus The number of processors available on the cluster.
+#'@param Ncpus The number of processors available.
 #'
 #'@param type_connec The type of connection between the processors. Supported
 #'cluster types are \code{"SOCK"}, \code{"PVM"}, \code{"MPI"}, and
@@ -161,24 +161,24 @@
 #'@export TcGSA.LR.parallel
 #'
 #'@examples
-#'
+#'                
+#'\dontrun{ 
 #'data(data_simu_TcGSA)
 #'
 #'tcgsa_sim_1grp <- TcGSA.LR(expr=expr_1grp, gmt=gmt_sim, design=design, 
 #'                           subject_name="Patient_ID", time_name="TimePoint",
 #'                           time_func="linear", crossedRandom=FALSE)
-#'                           
-#'\dontrun{ 
-#'require(doParallel)
-#'tcgsa_sim_1grp <- TcGSA.LR.parallel(Ncpus = 2, type_connec = 'SOCK',
+#'           
+#'library(doParallel)
+#'tcgsa_sim_1grp_par <- TcGSA.LR.parallel(Ncpus = 2, type_connec = 'SOCK',
 #'                             expr=expr_1grp, gmt=gmt_sim, design=design, 
 #'                             subject_name="Patient_ID", time_name="TimePoint",
 #'                             time_func="linear", crossedRandom=FALSE, 
 #'                             separateSubjects=TRUE)
-#'}
-#'tcgsa_sim_1grp
+#'
 #'summary(tcgsa_sim_1grp)
-#'     
+#'summary(tcgsa_sim_1grp_par)
+#'}     
 #'
 #'
 
@@ -189,7 +189,7 @@ TcGSA.LR.parallel <-
 			 time_func = "linear", group_name="", separateSubjects=FALSE,
 			 minGSsize=10, maxGSsize=500,
 			 monitorfile=""){
-		if (requireNamespace("doParallel", quietly = TRUE)) {
+		if (requireNamespace("doParallel", quietly = TRUE)){
 			requireNamespace("doParallel")
 			if(group_name!="" && separateSubjects){
 				stop("'separateSubjects' is TRUE while 'group_name' is not \"\".\n This is an attempt to separate subjects in a multiple group setting.\n This is not handled by the TcGSA.LR function.\n\n")
@@ -206,7 +206,7 @@ TcGSA.LR.parallel <-
 			doParallel::registerDoParallel(cl)
 			
 			
-			gs <- NULL # This is just to prevent R CMD check to issue a NOTE reanding "TcGSA.LR.parallel: no visible binding for global variable 'gs'". It is extremely ANNOYING !
+			gs <- NULL # This is just to prevent R CMD check to issue a NOTE reading "TcGSA.LR.parallel: no visible binding for global variable 'gs'". It is extremely ANNOYING !
 			res_par <- foreach::"%dopar%"(foreach::foreach(gs=1:length(gmt$genesets), .packages=c("lme4", "reshape2", "splines"), .export=c("TcGSA.dataLME")),
 										  {
 				probes <- intersect(gmt$genesets[[gs]], rownames(expr))

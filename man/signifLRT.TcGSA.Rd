@@ -63,7 +63,7 @@ A function that identifies the significant gene sets in an object of class
 '\code{TcGSA}'.
 }
 \examples{
-
+\dontrun{
 data(data_simu_TcGSA)
 
 tcgsa_sim_1grp <- TcGSA.LR(expr=expr_1grp, gmt=gmt_sim, design=design, 
@@ -73,11 +73,8 @@ tcgsa_sim_1grp <- TcGSA.LR(expr=expr_1grp, gmt=gmt_sim, design=design,
 sgnifs <- signifLRT.TcGSA(tcgsa_sim_1grp, threshold = 0.05, myproc = "BY",
                          nbsimu_pval = 1000, write=FALSE)
 sgnifs
-
-
 }
-\author{
-Boris P. Hejblum
+
 }
 \references{
 Hejblum BP, Skinner J, Thiebaut R, (2015) 
@@ -88,4 +85,6 @@ doi: 10.1371/journal.pcbi.1004310
 \seealso{
 \code{\link{multtest.TcGSA}}, \code{\link{TcGSA.LR}}
 }
-
+\author{
+Boris P. Hejblum
+}

@@ -223,7 +223,7 @@
 #'@param y.lab.angle 
 #'a numerical value (in [0, 360]) giving the orientation by
 #'which y-label text should be turned (anti-clockwise).  Default is \code{90}.
-#'See \code{\link[ggplot2:element_text]{element_text}}.
+#'See \code{\link{element_text}}.
 #'
 #'@param x.axis.angle 
 #'a numerical value (in [0, 360]) giving the orientation by
@@ -240,7 +240,7 @@
 #'be dropped.  See \code{\link{xlim}}.
 #'
 #'@param gg.add 
-#'A list of instructions to add to the ggplot2 instruction.  See \link{+.gg}.  Default is \code{list(theme())}, which adds nothing
+#'A list of instructions to add to the ggplot2 instruction.  See \code{\link{+.gg}}.  Default is \code{list(theme())}, which adds nothing
 #'to the plot.
 #'
 #'@param plot 
@@ -270,6 +270,7 @@
 #'
 #'@examples
 #'
+#'\dontrun{
 #'data(data_simu_TcGSA)
 #'tcgsa_sim_1grp <- TcGSA.LR(expr=expr_1grp, gmt=gmt_sim, design=design, 
 #'                           subject_name="Patient_ID", time_name="TimePoint",
@@ -282,7 +283,6 @@
 #'        time_unit="H",
 #'        lab.cex=0.7)
 #'
-#'\dontrun{ 
 #'plot1GS(expr=expr_1grp, TimePoint=design$TimePoint, 
 #'        Subject_ID=design$Patient_ID, gmt=gmt_sim,
 #'        geneset.name="Gene set 5",
@@ -321,7 +321,6 @@
 #')
 #'par(op)
 #'
-#'require(ggplot2)
 #'plot1GS(expr=expr_1grp, TimePoint=design$TimePoint, 
 #'        Subject_ID=design$Patient_ID, gmt=gmt_sim,
 #'        geneset.name="Gene set 5",
@@ -409,7 +408,6 @@ plot1GS <-
 			}
 		}
 		
-		
 		interest <- which(gmt$geneset.names==geneset.name)
 		if(length(interest)==0){
 			stop("The 'geneset.name' supplied is not in the 'gmt'")
@@ -425,8 +423,11 @@ plot1GS <-
 			select_probe <- dimnames(expr_sel)[[1]]
 			TimePoint <- sort(as.numeric(rep(dimnames(expr_sel)[[3]], dim(expr_sel)[2])))
 			Subject_ID <- rep(dimnames(expr_sel)[[2]], dim(expr_sel)[3])
+		}else{
+			stop("'expr' is neither a data.frame nor a list.")	
 		}
 		
+
 		data_stand <- t(apply(X=data_sel, MARGIN=1, FUN=scale))
 		if(indiv=="genes"){
 			data_stand_MedianByTP <- t(apply(X=data_stand, MARGIN=1, FUN=Fun_byIndex, index=as.factor(TimePoint), fun=aggreg.fun, na.rm=T))
@@ -434,7 +435,6 @@ plot1GS <-
 			data_tocast<-cbind.data.frame(TimePoint, Subject_ID, "M" = apply(X=data_stand, MARGIN=2, FUN=aggreg.fun))
 			data_stand_MedianByTP <- as.matrix(acast(data_tocast, formula="Subject_ID~TimePoint", value.var="M"))
 		}
-		
 		
 		if(!is.null(baseline)){
 			colbaseline <- which(sort(unique(TimePoint))==baseline)
@@ -655,7 +655,6 @@ plot1GS <-
 		if(plot){
 			print(p)
 		}
-		
 		classif <- classif[order(classif$Cluster), ]
 		invisible(classif)
 		

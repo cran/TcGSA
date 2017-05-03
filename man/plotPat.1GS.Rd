@@ -155,7 +155,7 @@ should be magnified relative to the default \code{1}.}
 
 \item{y.lab.angle}{a numerical value (in [0, 360]) giving the orientation by
 which y-label text should be turned (anti-clockwise).  Default is \code{90}.
-See \code{\link[ggplot2:element_text]{element_text}}.}
+See \code{\link{element_text}}.}
 
 \item{x.axis.angle}{a numerical value (in [0, 360]) giving the orientation by
 which x-axis annotation text should be turned (anti-clockwise).  Default is
@@ -198,6 +198,7 @@ clusters in the plotted gene set.  See
 }
 \examples{
 
+\dontrun{
 data(data_simu_TcGSA)
 tcgsa_sim_1grp <- TcGSA.LR(expr=expr_1grp, gmt=gmt_sim, design=design, 
                           subject_name="Patient_ID", time_name="TimePoint",
@@ -210,16 +211,13 @@ plotPat.1GS(expr=expr_1grp, TimePoint=design$TimePoint,
        time_unit="H",
        lab.cex=0.7)
 
-\dontrun{
 plotPat.1GS(expr=expr_1grp, TimePoint=design$TimePoint, 
        Subject_ID=design$Patient_ID, gmt=gmt_sim,
        geneset.name="Gene set 4",
        clustering=FALSE, baseline=1,
        time_unit="H",
        lab.cex=0.7)
-}        
-
-\dontrun{
+       
 colval <- c(hsv(0.56, 0.9, 1),
            hsv(0, 0.27, 1),
            hsv(0.52, 1, 0.5),
@@ -246,9 +244,7 @@ plotPat.1GS(expr=expr_1grp, TimePoint=design$TimePoint,
        gg.add=list(scale_color_manual(values=colval)),
        lab.cex=0.7
 )
-}
 
-\dontrun{
 plotPat.1GS(expr=tcgsa_sim_1grp$Estimations, TimePoint=design$TimePoint, 
        Subject_ID=design$Patient_ID, gmt=gmt_sim,
        geneset.name="Gene set 3",
@@ -257,9 +253,6 @@ plotPat.1GS(expr=tcgsa_sim_1grp$Estimations, TimePoint=design$TimePoint,
 )
 }
 
-}
-\author{
-Boris P. Hejblum
 }
 \references{
 Tibshirani, R., Walther, G. and Hastie, T., 2001, Estimating the
@@ -270,4 +263,6 @@ Statistical Society, Series B (Statistical Methodology)}, \bold{63}, 2:
 \seealso{
 \code{\link[ggplot2:ggplot]{ggplot}}, \code{\link[cluster:clusGap]{clusGap}}
 }
-
+\author{
+Boris P. Hejblum
+}

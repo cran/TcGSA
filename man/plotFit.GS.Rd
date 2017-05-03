@@ -56,6 +56,9 @@ This function plots graphs informing on the fit of the mixed modeling
 of the gene expression performed in TcGSA, for 1 or several gene sets.
 }
 \examples{
+
+\dontrun{
+
 data(data_simu_TcGSA)
 
 tcgsa_sim_1grp <- TcGSA.LR(expr=expr_1grp, gmt=gmt_sim, design=design, 
@@ -70,7 +73,6 @@ plotFit.GS(x=tcgsa_sim_1grp, expr=expr_1grp, design=design,
 				 color="genes", gg.add=list(guides(color=FALSE))
 )
 
-\dontrun{
 plotFit.GS(x=tcgsa_sim_1grp, expr=expr_1grp, design=design,
           subject_name="Patient_ID", time_name="TimePoint",
           colnames_ID="Sample_name", 
@@ -89,9 +91,6 @@ plotFit.GS(x=tcgsa_sim_1grp, expr=expr_1grp, design=design,
 }
 
 }
-\author{
-Boris P. Hejblum
-}
 \references{
 Hejblum BP, Skinner J, Thiebaut R, (2015) 
 Time-Course Gene Set Analysis for Longitudinal Gene Expression Data. 
@@ -101,4 +100,6 @@ doi: 10.1371/journal.pcbi.1004310
 \seealso{
 \code{\link{plot1GS}}, \code{\link{plotSelect.GS}}
 }
-
+\author{
+Boris P. Hejblum
+}

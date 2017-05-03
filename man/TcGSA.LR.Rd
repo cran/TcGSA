@@ -2,8 +2,8 @@
 % Please edit documentation in R/TcGSA.LR.R
 \name{TcGSA.LR}
 \alias{TcGSA.LR}
-\alias{print.TcGSA}
 \alias{print.TcGSA.LR}
+\alias{print.TcGSA}
 \title{Computing the Likelihood Ratios for the Gene Sets under Scrutiny}
 \usage{
 TcGSA.LR(expr, gmt, design, subject_name = "Patient_ID",
@@ -132,6 +132,7 @@ have significantly different trends over time depending on \code{Subjects}.
 }
 \examples{
 
+\dontrun{ 
 data(data_simu_TcGSA)
 
 tcgsa_sim_1grp <- TcGSA.LR(expr=expr_1grp, gmt=gmt_sim, design=design, 
@@ -140,17 +141,13 @@ tcgsa_sim_1grp <- TcGSA.LR(expr=expr_1grp, gmt=gmt_sim, design=design,
 tcgsa_sim_1grp
 summary(tcgsa_sim_1grp)
 
-
-\dontrun{ 
 plot(x=tcgsa_sim_1grp, expr=expr_1grp, 
     Subject_ID=design$Patient_ID, TimePoint=design$TimePoint,
     baseline=1, 
     B=100,
     time_unit="H"
     )
-}     
-
-\dontrun{    
+       
 tcgsa_sim_2grp <- TcGSA.LR(expr=expr_2grp, gmt=gmt_sim, design=design,
                           subject_name="Patient_ID", time_name="TimePoint",
                           time_func="linear", crossedRandom=FALSE, 
@@ -158,9 +155,6 @@ tcgsa_sim_2grp <- TcGSA.LR(expr=expr_2grp, gmt=gmt_sim, design=design,
 tcgsa_sim_2grp
 
 }
-}
-\author{
-Boris P. Hejblum
 }
 \references{
 Hejblum BP, Skinner J, Thiebaut R, (2015) 
@@ -173,4 +167,6 @@ doi: 10.1371/journal.pcbi.1004310
 and \code{\link{TcGSA.LR.parallel}} for an implementation using 
 parallel computing
 }
-
+\author{
+Boris P. Hejblum
+}

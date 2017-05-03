@@ -73,8 +73,8 @@
 #TODO See Details.
 #'
 #'@param baseline 
-#'a character string which is the value of \code{TimePoint}
-#'used as baseline.  See Details.
+#'the value of \code{TimePoint} to be used as baseline. Default is \code{NULL} 
+#'in which case expression is centered and no baseline is used.
 #'
 #'@param only.signif 
 #'logical flag for plotting only the significant gene sets.
@@ -346,6 +346,7 @@
 #'
 #'@examples
 #'
+#'\dontrun{
 #'data(data_simu_TcGSA)
 #'
 #'tcgsa_sim_1grp <- TcGSA.LR(expr=expr_1grp, gmt=gmt_sim, design=design, 
@@ -360,8 +361,7 @@
 #'     time_unit="H",
 #'     dendrogram.size=0.4, heatmap.width=0.8, heatmap.height=2, cex.main=0.7
 #'     )
-#'
-#'\dontrun{                
+#'            
 #'tcgsa_sim_2grp <- TcGSA.LR(expr=expr_2grp, gmt=gmt_sim, design=design, 
 #'                           subject_name="Patient_ID", time_name="TimePoint",
 #'                           time_func="linear", crossedRandom=FALSE, 
@@ -407,7 +407,9 @@ plot.TcGSA <-
 				}
 			}
 			else if(is.list(expr)){
-				if(!(baseline %in% dimnames(expr[[1]])[[3]])){
+				sel <- which(!is.na(expr))
+				if(length(sel)<1){stop("All tested gene sets have NA results...\n\n")}
+				if(!(baseline %in% dimnames(expr[[sel[1]]])[[3]])){
 					stop("The 'baseline' value used is not one of the time points in 'TimePoint'...\n\n")
 				}
 			}
@@ -477,8 +479,8 @@ plot.TcGSA <-
 		
 		medoids2clust <- reshape2::acast(reshape2::melt(clust_trends[["ClustMeds"]], variable.name="Cluster", id.vars="TimePoint"),
 										 formula="L1 + Cluster~ TimePoint", value.var="value")
-		gsNames <- gsub("_.*$", "", rownames(medoids2clust))
-		ncl <- gsub("^.*?_", "", rownames(medoids2clust))
+		gsNames <- gsub("_[123456789]?[123456789]$", "", rownames(medoids2clust))
+		ncl <- gsub("^.*_+", "", rownames(medoids2clust))
 		medoids2clust <- medoids2clust[,order(as.numeric(colnames(medoids2clust)))]
 		
 		if(ranking){

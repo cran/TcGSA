@@ -11,7 +11,7 @@ TcGSA.LR.parallel(Ncpus, type_connec, expr, gmt, design,
   minGSsize = 10, maxGSsize = 500, monitorfile = "")
 }
 \arguments{
-\item{Ncpus}{The number of processors available on the cluster.}
+\item{Ncpus}{The number of processors available.}
 
 \item{type_connec}{The type of connection between the processors. Supported
 cluster types are \code{"SOCK"}, \code{"PVM"}, \code{"MPI"}, and
@@ -141,29 +141,26 @@ scrutiny has been analysed (i.e. the two mixed models have been fitted, see
 \code{\link{TcGSA.LR}}) by one of the parallelized processors.
 }
 \examples{
-
+               
+\dontrun{ 
 data(data_simu_TcGSA)
 
 tcgsa_sim_1grp <- TcGSA.LR(expr=expr_1grp, gmt=gmt_sim, design=design, 
                           subject_name="Patient_ID", time_name="TimePoint",
                           time_func="linear", crossedRandom=FALSE)
-                          
-\dontrun{ 
-require(doParallel)
-tcgsa_sim_1grp <- TcGSA.LR.parallel(Ncpus = 2, type_connec = 'SOCK',
+          
+library(doParallel)
+tcgsa_sim_1grp_par <- TcGSA.LR.parallel(Ncpus = 2, type_connec = 'SOCK',
                             expr=expr_1grp, gmt=gmt_sim, design=design, 
                             subject_name="Patient_ID", time_name="TimePoint",
                             time_func="linear", crossedRandom=FALSE, 
                             separateSubjects=TRUE)
-}
-tcgsa_sim_1grp
+
 summary(tcgsa_sim_1grp)
-    
+summary(tcgsa_sim_1grp_par)
+}     
 
 
-}
-\author{
-Boris P. Hejblum
 }
 \references{
 Hejblum BP, Skinner J, Thiebaut R, (2015) 
@@ -174,4 +171,6 @@ doi: 10.1371/journal.pcbi.1004310
 \seealso{
 \code{\link{summary.TcGSA}}, \code{\link{plot.TcGSA}}
 }
-
+\author{
+Boris P. Hejblum
+}

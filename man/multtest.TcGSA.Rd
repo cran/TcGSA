@@ -46,6 +46,7 @@ multiple testing correction.
 }
 \examples{
 
+\dontrun{
 data(data_simu_TcGSA)
 
 tcgsa_sim_1grp <- TcGSA.LR(expr=expr_1grp, gmt=gmt_sim, design=design, 
@@ -55,15 +56,14 @@ tcgsa_sim_1grp <- TcGSA.LR(expr=expr_1grp, gmt=gmt_sim, design=design,
 mtt <- multtest.TcGSA(tcgsa_sim_1grp, threshold = 0.05, 
                      myproc = "BY", nbsimu_pval = 1000)
 mtt
-
-
 }
-\author{
-Boris P. Hejblum
+
 }
 \seealso{
 \code{\link{TcGSA.LR}}, 
 \code{\link[multtest:mt.rawp2adjp]{mt.rawp2adjp}},
 \code{\link{signifLRT.TcGSA}}
 }
-
+\author{
+Boris P. Hejblum
+}
