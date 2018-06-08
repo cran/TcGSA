@@ -1,7 +1,7 @@
 #'Computing P-values with a Simulated Sample from the Null Distribution
 #'
 #'This function computes the p-value of a statistic using a simulated sample
-#'from its therotical null distribution.
+#'from its theoretical null distribution.
 #'
 #'
 #'@param s 
@@ -15,7 +15,7 @@
 #'
 #'@author Boris P. Hejblum
 #'
-#'@seealso \code{\link{rmixchisq}}
+#'@seealso \code{\link{rchisqmix}}
 #'
 #'@keywords internal
 #'

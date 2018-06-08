@@ -1,4 +1,4 @@
-#'Identifiying the Significant Gene Sets
+#'Identifying the Significant Gene Sets
 #'
 #'A function that identifies the significant gene sets in an object of class
 #''\code{TcGSA}'.
@@ -17,12 +17,12 @@
 #'This vector should include any of the following: "\code{Bonferroni}",
 #'"\code{Holm}", "\code{Hochberg}", "\code{SidakSS}", "\code{SidakSD}",
 #'"\code{BH}", "\code{BY}", "\code{ABH}", "\code{TSBH}" or "\code{none}".  
-#'"\code{none}" indicates no adjustement for multiple testing. See
+#'"\code{none}" indicates no adjustment for multiple testing. See
 #'\code{\link[multtest:mt.rawp2adjp]{mt.rawp2adjp}} for details.  Default is
 #'"\code{BY}", the Benjamini & Yekutieli (2001) step-up FDR-controlling
 #'procedure (general dependency structures).  In order to control the FWER(in
 #'case of an analysis that is more a hypothesis confirmation than an
-#'exploration of the expression data), we recommand to use "\code{Holm}", the
+#'exploration of the expression data), we recommend to use "\code{Holm}", the
 #'Holm (1979) step-down adjusted p-values for strong control of the FWER.
 #'
 #'@param nbsimu_pval 
@@ -45,13 +45,13 @@
 #'
 #'@return \code{signifLRT.TcGSA} returns a list. 
 #'
-#'The fisrt element \code{mixedLRTadjRes} is data frame with \eqn{p} rows (one
+#'The first element \code{mixedLRTadjRes} is data frame with \eqn{p} rows (one
 #'row for each significant gene set) and the 3 following variables:
 #'\itemize{
-#'\item GeneSet the significant gene set name from the gmt object.
-#'\item AdjPval the adjusted p-value corresponding to the signicant gene
+#'\item \code{GeneSet} the significant gene set name from the gmt object.
+#'\item \code{AdjPval} the adjusted p-value corresponding to the significant gene
 #'set.
-#'\item desc the significant gene set description from the gmt object.
+#'\item \code{desc} the significant gene set description from the gmt object.
 #'}
 #'
 #'The second element \code{multCorProc} passes along the multiple testing 
@@ -66,7 +66,7 @@
 #'
 #'@references Hejblum BP, Skinner J, Thiebaut R, (2015) 
 #'Time-Course Gene Set Analysis for Longitudinal Gene Expression Data. 
-#'\emph{PLoS Computat Biol} 11(6): e1004310.
+#'\emph{PLoS Computat. Biol.} 11(6): e1004310.
 #'doi: 10.1371/journal.pcbi.1004310
 #'
 #'@importFrom gtools mixedorder
@@ -114,11 +114,11 @@ function(tcgsa, threshold=0.05, myproc="BY", nbsimu_pval = 1e+06, write=F, txtfi
    if(!is.null(txtfilename)){
      if (is.null(directory)){
         directory <- getwd()
-        cat("Warning: 'directory' argument is empty, output file written in the current working directory")
+        warning("'directory' argument is empty, output file written in the current working directory")
       }
       utils::write.table(Res_Linear_Mod_FDR, file=paste(directory, txtfilename, sep="/"), row.names=FALSE, sep="\t")
     }else{
-      cat("ERROR: could not write the significant results file because the argument 'txtfilename' is empty")
+      warning("Could not write the significant results file because the argument 'txtfilename' is empty")
     }
   }
   return(list("mixedLRTadjRes"=Res_Linear_Mod_FDR, "multCorProc"= myproc, "threshold"=threshold))

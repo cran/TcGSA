@@ -5,7 +5,7 @@
 \title{Computing the P-value of the Likelihood Ratios Applying a Multiple Testing
 Correction}
 \usage{
-multtest.TcGSA(tcgsa, threshold = 0.05, myproc = "BY",
+multtest.TcGSA(tcgsa, threshold = 0.05, myproc = "BY", exact = TRUE,
   nbsimu_pval = 1e+06)
 }
 \arguments{
@@ -19,16 +19,20 @@ multiple testing procedures for which adjusted p-values are to be computed.
 This vector should include any of the following: "\code{Bonferroni}",
 "\code{Holm}", "\code{Hochberg}", "\code{SidakSS}", "\code{SidakSD}",
 "\code{BH}", "\code{BY}", "\code{ABH}", "\code{TSBH}" or "\code{none}".  
-"\code{none}" indicates no adjustement for multiple testing.  See
+"\code{none}" indicates no adjustment for multiple testing.  See
 \code{\link[multtest:mt.rawp2adjp]{mt.rawp2adjp}} for details.  Default is
 "\code{BY}", the Benjamini & Yekutieli (2001) step-up FDR-controlling
 procedure (general dependency structures).  In order to control the FWER (in
 case of an analysis that is more a hypothesis confirmation than an
-exploration of the expression data), we recommand to use "\code{Holm}", the
+exploration of the expression data), we recommend to use "\code{Holm}", the
 Holm (1979) step-down adjusted p-values for strong control of the FWER.}
 
+\item{exact}{logical flag indicating whether the raw p-values should be computed from the 
+exact asymptotic mixture of chi-square, or simulated (longer and not better).
+Default is \code{TRUE} and should be preferred.}
+
 \item{nbsimu_pval}{the number of observations under the null distribution to
-be generated in order to compute the p-values. Default is \code{1e+06}}
+be generated in order to compute the p-values. Default is \code{1e+06}.}
 }
 \value{
 \code{multtest.TcGSA} returns an dataframe with 5 variables.  The

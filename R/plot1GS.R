@@ -53,7 +53,7 @@
 #'@param baseline 
 #'a character string which is the value of \code{TimePoint}
 #'that can be used as a baseline.  Default is \code{NULL}, in which case no
-#'timepoint is used as a baseline value for gene expression.  Has to be
+#'time point is used as a baseline value for gene expression.  Has to be
 #'\code{NULL} when comparing two treatment groups.
 #TODO See Details.
 #'
@@ -90,9 +90,9 @@
 #'a function which accepts as first argument a matrix
 #'\code{x} and as second argument the number of clusters desired \code{k}, and
 #'which returns a list with a component named \code{'cluster'} which is a
-#'vector of length n = nrow(x) of integers in 1:k, determining the clustering
+#'vector of length \code{n = nrow(x)} of integers in 1:k, determining the clustering
 #'or grouping of the n observations.  Default is \code{NULL}, in which case a
-#'hierachical clustering is performed via the function
+#'hierarchical clustering is performed via the function
 #'\code{\link[cluster:agnes]{agnes}}, using the metric \code{clustering_metric}
 #'and the method \code{clustering_method}.  See \code{'FUNcluster'} in
 #'\code{\link[cluster:clusGap]{clusGap}} and Details.
@@ -104,7 +104,7 @@
 #'options are \code{"euclidean"} and \code{"manhattan"}.  Default is
 #'\code{"euclidean"}.  See \code{\link[cluster:agnes]{agnes}}.  Also, a \code{"sts"} option 
 #'is available in TcGSA.  It implements the 'Short Time Series' distance 
-#'[Moller-Levet et al., Fuzzy CLustering of short time series and unevenly distributed 
+#'[Moller-Levet et al., Fuzzy Clustering of short time series and unevenly distributed 
 #'sampling points, \emph{Advances in Intelligent Data Analysis V}:330-340 Springer, 2003]
 #'designed specifically for clustering time series.
 #'
@@ -127,16 +127,16 @@
 #'to be tested.  Default is \code{4}.
 #'
 #'@param aggreg.fun 
-#'a character string such as \code{"mean"}, \code{"median"}
+#'a character string such as  \code{"median"} or \code{"mean"}
 #'or the name of any other defined statistics function that returns a single
 #'numeric value.  It specifies the function used to aggregate the observations
-#'before the clustering.  Default is to \code{median}.
+#'before the clustering.  Default is to \code{"mean"}.
 #'
 #'@param trend.fun 
-#'a character string such as \code{"mean"}, \code{"median"} or
+#'a character string such as \code{"mean"} or
 #'the name of any other function that returns a single numeric value.  It
 #'specifies the function used to calculate the trends of the identified
-#'clustered.  Default is to \code{median}.
+#'clustered.  Default is to \code{"mean"}.
 #'
 #'@param methodOptiClust 
 #'character string indicating how the "optimal" number
@@ -169,7 +169,7 @@
 #'@param smooth 
 #'logical flag.  If \code{TRUE} and \code{showTrend} is also
 #'\code{TRUE}, the representation of each cluster \code{trend.fun} is smoothed
-#'using cubic polynoms (see \code{\link[ggplot2:geom_smooth]{geom_smooth}}.
+#'using cubic polynomials (see \code{\link[ggplot2:geom_smooth]{geom_smooth}}.
 #'Default is \code{TRUE}. 
 #'At the moment, must accept parameter \code{"na.rm"} (which is automatically set to \code{TRUE}). 
 #'This might change in future versions
@@ -183,7 +183,7 @@
 #'the time unit to be displayed (such as \code{"Y"},
 #'\code{"M"}, \code{"W"}, \code{"D"}, \code{"H"}, etc) next to the values of
 #'\code{TimePoint} on the x-axis.  Default is \code{""}, in which case the time 
-#'scale on the x-axis is proportionnal to the time values.
+#'scale on the x-axis is proportional to the time values.
 #'
 #'@param title 
 #'character specifying the title of the plot.  If \code{NULL}, a
@@ -240,17 +240,19 @@
 #'be dropped.  See \code{\link{xlim}}.
 #'
 #'@param gg.add 
-#'A list of instructions to add to the ggplot2 instruction.  See \code{\link{+.gg}}.  Default is \code{list(theme())}, which adds nothing
+#'A list of instructions to add to the \code{ggplot2} instructions.  
+#'See \code{\link{+.gg}}.  Default is \code{list(theme())}, which adds nothing
 #'to the plot.
 #'
 #'@param plot 
 #'logical flag.  If \code{FALSE}, no plot is drawn.  Default is \code{TRUE}.
 #'
-#'@return A dataframe the 2 following variables: \itemize{
-#'\item \code{ProbeID} which contains the IDs of the probes of the plotted gene set.
-#'\item \code{Cluster} which to which cluster the probe belongs to.
-#'} If \code{clustering} is \code{FALSE}, then \code{Cluster} is \code{NA} for all the probes.
-#'
+#'@return A list with 2 elements:\itemize{
+#'   \item \code{classif}: a \code{data.frame} with  the 2 following variables: \code{ProbeID} which 
+#'   contains the IDs of the probes of the plotted gene set, and \code{Cluster} containing $
+#'   which cluster the probe belongs to. If \code{clustering} is \code{FALSE}, then \code{Cluster} is \code{NA} for all the probes.
+#'   \item \code{p}: a \code{ggplot} object containing the plot
+#'}
 #'@author Boris P. Hejblum
 #'
 #'@seealso \code{\link[ggplot2:ggplot]{ggplot}}, \code{\link[cluster:clusGap]{clusGap}}
@@ -291,13 +293,14 @@
 #'        lab.cex=0.7)
 #'}
 #'\dontrun{        
-#'plot1GS(expr=tcgsa_sim_1grp$Estimations, TimePoint=design$TimePoint, 
-#'        Subject_ID=design$Patient_ID, gmt=gmt_sim,
-#'        geneset.name="Gene set 5",
-#'        indiv="genes",
-#'        time_unit="H",
-#'        lab.cex=0.7
+#'geneclusters <- plot1GS(expr=tcgsa_sim_1grp$Estimations, TimePoint=design$TimePoint, 
+#'Subject_ID=design$Patient_ID, gmt=gmt_sim,
+#'geneset.name="Gene set 5",
+#'indiv="genes",
+#'time_unit="H",
+#'lab.cex=0.7
 #')
+#'geneclusters
 #'}
 #'
 #'\dontrun{
@@ -401,10 +404,10 @@ plot1GS <-
 		
 		if(is.null(y.lab)){
 			if(is.data.frame(expr)){
-				y.lab <- paste(capwords(aggreg.fun), 'of standardized gene expression')
+				y.lab <- paste(capwords(aggreg.fun), 'of standardized gene expression')# per', substr(indiv, 0, nchar(indiv)-1))
 			}
 			else{
-				y.lab <- paste(capwords(aggreg.fun), 'of standardized estimate')
+				y.lab <- paste(capwords(aggreg.fun), 'of standardized estimate')# per', substr(indiv, 0, nchar(indiv)-1))
 			}
 		}
 		
@@ -454,7 +457,7 @@ plot1GS <-
 		if(clustering | showTrend){
 			if(!pre_clustering){
 				if(verbose){
-					cat("Optimally clustering...\n")
+					message("Optimally clustering...\n")
 				}
 				kmax <- ifelse(dim(data_stand_MedianByTP)[1]>4, max_trends, dim(data_stand_MedianByTP)[1]-1)
 				
@@ -494,7 +497,7 @@ plot1GS <-
 				colnames(medoids) <- c("TimePoint", levels(precluster))
 			}
 			if(verbose){
-				cat("DONE\n")
+				message("DONE\n")
 			}
 			
 			
@@ -656,7 +659,7 @@ plot1GS <-
 			print(p)
 		}
 		classif <- classif[order(classif$Cluster), ]
-		invisible(classif)
+		invisible(list("classif" = classif, "p" = p))
 		
 	}
 

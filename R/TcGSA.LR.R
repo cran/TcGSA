@@ -40,7 +40,7 @@
 #'expression was measured).  Default is \code{'TimePoint'}.  See Details.
 #'
 #'@param crossedRandom
-#'logical flag indicating wether the random effects of the subjects and of the time points
+#'logical flag indicating whether the random effects of the subjects and of the time points
 #'should be modeled as one crossed random effect or as two separated random effects.  
 #'Default is \code{FALSE}. See details.
 #'
@@ -73,13 +73,13 @@
 #'
 #'@param minGSsize 
 #'the minimum number of genes in a gene set.  If there are
-#'less genes than this number in one of the gene sets under scrutinity, the
+#'less genes than this number in one of the gene sets under scrutiny, the
 #'Likelihood Ratio of this gene set is not computed (the mixed model are not
 #'fitted). Default is \code{10} genes as the minimum.
 #'
 #'@param maxGSsize 
 #'the maximum number of genes in a gene set.  If there are
-#'more genes than this number in one of the gene sets under scrutinity, the
+#'more genes than this number in one of the gene sets under scrutiny, the
 #'Likelihood Ratio of this gene set is not computed (the mixed model are not
 #'fitted).  This is to avoid very long computation times.  Default is
 #'\code{500} genes as the maximum.
@@ -133,7 +133,7 @@
 #'
 #'@references Hejblum BP, Skinner J, Thiebaut R, (2015) 
 #'Time-Course Gene Set Analysis for Longitudinal Gene Expression Data. 
-#'\emph{PLoS Computat Biol} 11(6): e1004310.
+#'\emph{PLoS Computat. Biol.} 11(6): e1004310.
 #'doi: 10.1371/journal.pcbi.1004310
 #'
 #'@importFrom GSA GSA.read.gmt
@@ -246,7 +246,7 @@ function(expr, gmt, design, subject_name="Patient_ID", time_name="TimePoint", cr
         	dimnames(estims_tab)[[3]] <- as.numeric(dimnames(estims_tab)[[3]])*10
         }
         estim_expr[[gs]] <- estims_tab
-        cat("Unable to fit the mixed models for this gene set\n")
+        warning("Unable to fit the mixed models for this gene set\n")
       }
     	
     }else{
@@ -255,9 +255,9 @@ function(expr, gmt, design, subject_name="Patient_ID", time_name="TimePoint", cr
 	    CVG_H1[gs] <- NA
 	    
 	    estim_expr[[gs]] <- NA
-	    cat("The size of the gene set ",  gmt$geneset.names[[gs]], "is problematic (too many or too few genes)\n")
+	    warning("The size of the gene set ",  gmt$geneset.names[[gs]], "is problematic (too many or too few genes)\n")
 	}
-    cat(paste(gs,"/", length(gmt$genesets)," gene sets analyzed\n", sep=""))
+    message(paste(gs,"/", length(gmt$genesets)," gene sets analyzed\n", sep=""))
   }
   
   if(group_name==""){

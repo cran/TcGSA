@@ -17,7 +17,7 @@ The p-value associated to the observation \code{s}.
 }
 \description{
 This function computes the p-value of a statistic using a simulated sample
-from its therotical null distribution.
+from its theoretical null distribution.
 }
 \examples{
 
@@ -29,7 +29,7 @@ TcGSA:::pval_simu(s=1.96, theo_dist)
 
 }
 \seealso{
-\code{\link{rmixchisq}}
+\code{\link{rchisqmix}}
 }
 \author{
 Boris P. Hejblum
