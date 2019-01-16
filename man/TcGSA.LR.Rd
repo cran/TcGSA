@@ -7,9 +7,10 @@
 \title{Computing the Likelihood Ratios for the Gene Sets under Scrutiny}
 \usage{
 TcGSA.LR(expr, gmt, design, subject_name = "Patient_ID",
-  time_name = "TimePoint", crossedRandom = FALSE, covariates_fixed = "",
-  time_covariates = "", time_func = "linear", group_name = "",
-  separateSubjects = FALSE, minGSsize = 10, maxGSsize = 500)
+  time_name = "TimePoint", crossedRandom = FALSE,
+  covariates_fixed = "", time_covariates = "", time_func = "linear",
+  group_name = "", separateSubjects = FALSE, minGSsize = 10,
+  maxGSsize = 500)
 
 \method{print}{TcGSA}(x, ...)
 }
@@ -159,7 +160,7 @@ tcgsa_sim_2grp
 \references{
 Hejblum BP, Skinner J, Thiebaut R, (2015) 
 Time-Course Gene Set Analysis for Longitudinal Gene Expression Data. 
-\emph{PLoS Computat. Biol.} 11(6): e1004310.
+\emph{PLOS Comput. Biol.} 11(6):e1004310.
 doi: 10.1371/journal.pcbi.1004310
 }
 \seealso{

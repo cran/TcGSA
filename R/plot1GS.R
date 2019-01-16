@@ -368,8 +368,8 @@ plot1GS <-
 		}
 		
 		if(is.null(FUNcluster)){
-			FUNcluster <- switch(EXPR=clustering_metric,
-								 sts= function(x, k, time, ...){
+			FUNcluster <- switch(EXPR = clustering_metric,
+								 sts = function(x, k, time, ...){
 								 	d <- STSdist(m=x, time = time)
 								 	clus <- stats::cutree(agnes(d, ...), k=k)
 								 	return(list("cluster"=clus))
@@ -432,12 +432,13 @@ plot1GS <-
 		
 
 		data_stand <- t(apply(X=data_sel, MARGIN=1, FUN=scale))
-		if(indiv=="genes"){
-			data_stand_MedianByTP <- t(apply(X=data_stand, MARGIN=1, FUN=Fun_byIndex, index=as.factor(TimePoint), fun=aggreg.fun, na.rm=T))
+		if(indiv == "genes"){
+			data_stand_MedianByTP <- t(apply(X=data_stand, MARGIN=1, FUN=Fun_byIndex, index=as.factor(TimePoint), fun=aggreg.fun, na.rm=TRUE))
 		}else if(indiv=="patients"){
-			data_tocast<-cbind.data.frame(TimePoint, Subject_ID, "M" = apply(X=data_stand, MARGIN=2, FUN=aggreg.fun))
+			data_tocast<-cbind.data.frame(TimePoint, Subject_ID, "M" = apply(X=data_stand, MARGIN=2, FUN=aggreg.fun, na.rm=TRUE))
 			data_stand_MedianByTP <- as.matrix(acast(data_tocast, formula="Subject_ID~TimePoint", value.var="M"))
 		}
+		
 		
 		if(!is.null(baseline)){
 			colbaseline <- which(sort(unique(TimePoint))==baseline)
@@ -479,7 +480,7 @@ plot1GS <-
 				
 				
 				medoids <- as.data.frame(t(apply(X=data_stand_MedianByTP, MARGIN=2, FUN=Fun_byIndex, index=clust, fun=trend.fun)))
-				if(dim(medoids)[1]==1){
+				if(dim(medoids)[1] == 1){
 					medoids <- cbind.data.frame("TimePoint"= colnames(medoids), "1"=t(medoids))
 				}else{
 					medoids <- cbind.data.frame("TimePoint"= rownames(medoids), medoids)
@@ -554,11 +555,17 @@ plot1GS <-
 			x.lim <- c(min(MeasPt), max(MeasPt))
 		}
 		
-		p <- (ggplot(meltedData, aes_string(x="TimePoint", y="value")) 
-			  + geom_hline(aes(yintercept = 0), linetype=1, colour='grey50', size=0.4*line.size)
-			  + theme(panel.border=element_rect(fill=NA, size=0.1*line.size, colour='grey50'),
+		
+		#removing NA values for plotting
+		na_bool <- is.na(meltedData$value)
+		if(sum(na_bool)>0){
+			meltedData <- meltedData[-which(na_bool), ]
+		}
+		
+		p <- ggplot(meltedData, aes_string(x="TimePoint", y="value")) + 
+			geom_hline(aes(yintercept = 0), linetype=1, colour='grey50', size=0.4*line.size) + 
+			theme(panel.border=element_rect(fill=NA, size=0.1*line.size, colour='grey50'),
 			  		axis.ticks=element_line(size=0.4*line.size, colour='grey50'))
-		)
 		
 		myalpha <- 1 
 		if(showTrend){
@@ -567,19 +574,19 @@ plot1GS <-
 		
 		if(clustering | pre_clustering){
 			p <- (p
-				  + geom_line(aes_string(group="Probe_ID", colour="Cluster"), size=0.5*line.size, alpha=myalpha)
-				  + guides(colour = guide_legend(override.aes=list(size=1, fill="white"), keywidth=2*lab.cex, 
-				  							   title.theme=element_text(size = 15*lab.cex, angle=0),
-				  							   label.theme=element_text(size = 9*lab.cex, angle=0)
+				  + geom_line(aes_string(group = "Probe_ID", colour = "Cluster"), size=0.5*line.size, alpha = myalpha)
+				  + guides(colour = guide_legend(override.aes = list(size=1, fill="white"), keywidth=2*lab.cex, 
+				  							   title.theme = element_text(size = 15*lab.cex, angle=0),
+				  							   label.theme = element_text(size = 9*lab.cex, angle=0)
 				  )
 				  )
 			)
 		}else{
-			p <- (p
-				  + geom_line(aes_string(group="Probe_ID", colour="Probe_ID"), size=0.5*line.size, alpha=myalpha)
-			)
+			p <- p + 
+				geom_line(aes_string(group = "Probe_ID", colour = "Probe_ID"), size = 0.5*line.size, alpha = myalpha)
+			
 			if(indiv=="patients"){
-				p <- (p + guides(colour=guide_legend(title='Subject')))
+				p <- (p + guides(colour=guide_legend(title = 'Subject')))
 				#+ scale_colour_manual(guide='none', name='Subject', values=rainbow(length(select_probe))))
 			}
 		}
@@ -610,7 +617,7 @@ plot1GS <-
 					p <- (p + geom_line(data=meltedStats, aes_string(x="TimePoint", y="value", group="Cluster", linetype="Cluster"), colour="black", size=3))
 				}
 			}else{
-				if(length(MeasPt)<4){
+				if(length(MeasPt) <= 4){
 					stop("Not enough time points to estimate a smoothed trend! 
     				 Set 'smooth' argument to 'FALSE'.\n")
 				}

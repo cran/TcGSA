@@ -43,6 +43,10 @@
 #'directory of the .txt file in which the results table is to be written, if
 #'\code{write} is \code{TRUE}. Default is \code{NULL}.
 #'
+#'@param exact logical flag indicating whether the raw p-values should be computed from the 
+#'exact asymptotic mixture of chi-square, or simulated (longer and not better).
+#'Default is \code{TRUE} and should be preferred.
+#'
 #'@return \code{signifLRT.TcGSA} returns a list. 
 #'
 #'The first element \code{mixedLRTadjRes} is data frame with \eqn{p} rows (one
@@ -66,7 +70,7 @@
 #'
 #'@references Hejblum BP, Skinner J, Thiebaut R, (2015) 
 #'Time-Course Gene Set Analysis for Longitudinal Gene Expression Data. 
-#'\emph{PLoS Computat. Biol.} 11(6): e1004310.
+#'\emph{PLOS Comput. Biol.} 11(6):e1004310.
 #'doi: 10.1371/journal.pcbi.1004310
 #'
 #'@importFrom gtools mixedorder
@@ -89,9 +93,10 @@
 #'}
 #'
 signifLRT.TcGSA <-
-function(tcgsa, threshold=0.05, myproc="BY", nbsimu_pval = 1e+06, write=F, txtfilename=NULL, directory=NULL){  
+function(tcgsa, threshold=0.05, myproc="BY", nbsimu_pval = 1e+06, write=F, 
+		 txtfilename=NULL, directory=NULL, exact=TRUE){  
   gmt  <-  tcgsa[["GeneSets_gmt"]]
-  signif <- multtest.TcGSA(tcgsa, threshold, myproc, nbsimu_pval)
+  signif <- multtest.TcGSA(tcgsa, threshold, myproc, exact, nbsimu_pval)
 
   signif_mod <- gmt$geneset.name[which(signif$adj_pval<threshold)]
   if(!is.null(signif_mod)){

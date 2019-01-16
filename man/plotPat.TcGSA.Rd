@@ -4,16 +4,17 @@
 \alias{plotPat.TcGSA}
 \title{Plot a Gene Set Trends Heatmap for each Patient.}
 \usage{
-plotPat.TcGSA(x, threshold = 0.05, myproc = "BY", nbsimu_pval = 1e+06,
-  expr, Subject_ID, TimePoint, baseline = NULL, only.signif = TRUE,
-  group.var = NULL, Group_ID_paired = NULL, ref = NULL,
-  group_of_interest = NULL, FUNcluster = NULL,
-  clustering_metric = "euclidian", clustering_method = "ward", B = 500,
-  max_trends = 4, aggreg.fun = "median", methodOptiClust = "firstSEmax",
-  verbose = TRUE, clust_trends = NULL, N_clusters = NULL,
-  myclusters = NULL, label.clusters = NULL, prev_rowCL = NULL,
-  descript = TRUE, plotAll = TRUE, color.vec = c("darkred", "#D73027",
-  "#FC8D59", "snow", "#91BFDB", "#4575B4", "darkblue"), legend.breaks = NULL,
+plotPat.TcGSA(x, threshold = 0.05, myproc = "BY",
+  nbsimu_pval = 1e+06, expr, Subject_ID, TimePoint, baseline = NULL,
+  only.signif = TRUE, group.var = NULL, Group_ID_paired = NULL,
+  ref = NULL, group_of_interest = NULL, FUNcluster = NULL,
+  clustering_metric = "euclidian", clustering_method = "ward",
+  B = 500, max_trends = 4, aggreg.fun = "median",
+  methodOptiClust = "firstSEmax", verbose = TRUE,
+  clust_trends = NULL, N_clusters = NULL, myclusters = NULL,
+  label.clusters = NULL, prev_rowCL = NULL, descript = TRUE,
+  plotAll = TRUE, color.vec = c("darkred", "#D73027", "#FC8D59",
+  "snow", "#91BFDB", "#4575B4", "darkblue"), legend.breaks = NULL,
   label.column = NULL, time_unit = "", cex.label.row = 1,
   cex.label.column = 1, margins = c(5, 25), heatKey.size = 1,
   dendrogram.size = 1, heatmap.height = 1, heatmap.width = 1,
@@ -314,7 +315,7 @@ plotPat.TcGSA(x=tcgsa_sim_1grp, expr=tcgsa_sim_1grp$Estimations,
 \references{
 Hejblum BP, Skinner J, Thiebaut R, (2015) 
 Time-Course Gene Set Analysis for Longitudinal Gene Expression Data. 
-\emph{PLoS Computat. Biol.} 11(6): e1004310.
+\emph{PLOS Comput. Biol.} 11(6):e1004310.
 doi: 10.1371/journal.pcbi.1004310
 }
 \seealso{
