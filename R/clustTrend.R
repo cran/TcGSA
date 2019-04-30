@@ -69,7 +69,7 @@
 #'a character string which is the value of \code{TimePoint}
 #'that can be used as a baseline.  Default is \code{NULL}, in which case no
 #'time point is used as a baseline value for gene expression.  Has to be
-#'\code{NULL} when comparing two treatment groups.
+#'\code{NULL} when comparing several treatment groups.
 #TODO See Details.
 #'
 #'@param only.signif 
@@ -150,6 +150,12 @@
 #'before the clustering.  Default is to \code{median}.  Default is
 #'\code{"median"}.
 #'
+#'@param na.rm.aggreg
+#'a logical flag indicating whether \code{NA} should be remove to prevent 
+#'propagation through \code{aggreg.fun}. Can be useful to set to TRUE with 
+#'unbalanced design as those will generate structural \code{NA}s in 
+#'\code{$Estimations}. Default is \code{TRUE}.
+#'
 #'@param trend.fun 
 #'a character string such as \code{"mean"}, \code{"median"} or
 #'the name of any other function that returns a single numeric value.  It
@@ -173,6 +179,7 @@
 #'@param verbose 
 #'logical flag enabling verbose messages to track the computing
 #'status of the function.  Default is \code{TRUE}.
+#'
 #'
 #'@return An object of class \bold{\link{ClusteredTrends}} which is a list with
 #'the 4 following components: \itemize{
@@ -241,10 +248,20 @@ clustTrend <-
 			 only.signif=TRUE, group.var=NULL, Group_ID_paired=NULL, 
 			 ref=NULL, group_of_interest=NULL, FUNcluster=NULL, 
 			 clustering_metric="euclidian", clustering_method="ward", 
-			 B=100,	 max_trends=4, aggreg.fun="median", 
+			 B=100,	 max_trends=4, aggreg.fun="median", na.rm.aggreg = TRUE,
 			 trend.fun="median", methodOptiClust = "firstSEmax",
 			 indiv="genes", verbose=TRUE
 	){
+		
+		if(is.null(group.var) & (!is.null(group_of_interest) | !is.null(ref))){
+			stop("'group.var' is NULL while 'group_of_interest' or 'ref' is not")
+		}
+		if(!is.null(group.var) & !is.null(baseline)){
+			stop("if 'group.var' is not NULL, then baseline must be NULL")
+		}
+		if(!is.null(group.var) & (is.null(group_of_interest) | is.null(ref))){
+			stop("if 'group.var' is not NULL, then both 'group_of_interest' and 'ref' must also not be NULL")
+		}
 		
 		
 		Fun_byIndex<-function(X, index, fun, ...){
@@ -259,7 +276,7 @@ clustTrend <-
 								 	return(list("cluster"=clus))
 								 },
 								 function(x, k, ...){
-								 	clus <- stats::cutree(agnes(x, method=clustering_method, metric=clustering_metric, ...), k=k)
+								 	clus <- stats::cutree(cluster::agnes(x, method=clustering_method, metric=clustering_metric, ...), k=k)
 								 	return(list("cluster"=clus))
 								 }
 			)
@@ -320,8 +337,8 @@ clustTrend <-
 					select_probe <- dimnames(expr_sel)[[1]]
 					TimePoint <- sort(as.numeric(rep(dimnames(expr_sel)[[3]], dim(expr_sel)[2])))
 					Subject_ID <- rep(dimnames(expr_sel)[[2]], dim(expr_sel)[3])
+
 				}
-				
 				data_stand <- t(apply(X=data_sel, MARGIN=1, FUN=scale))
 				data_stand[unique(which(is.nan(data_stand), arr.ind=TRUE)[,1]), ] <- 0 
 				if(indiv=="genes"){
@@ -335,7 +352,7 @@ clustTrend <-
 				if(!is.null(baseline)){
 					colbaseline <- which(sort(unique(TimePoint))==baseline)
 					if(length(colbaseline)==0){
-						stop("the 'baseline' value used is not one of the time points in 'TimePoint'...\n")
+						stop("the 'baseline' value used is not one of the time points in 'TimePoint'")
 					}
 					data_stand_ByTP <- data_stand_ByTP-data_stand_ByTP[,colbaseline]
 				}
@@ -343,7 +360,7 @@ clustTrend <-
 			}
 			else{
 				if(!is.null(baseline)){
-					stop("the 'baseline' argument is not NULL while a grouping variable is supplied in 'group.var'...\n")
+					stop("the 'baseline' argument must be NULL when a grouping variable is supplied in 'group.var'")
 				}
 				if(is.data.frame(expr) | is.matrix(expr)){
 					select_probe <- intersect(rownames(expr), unique(gmt$genesets[[interest]]))
@@ -357,6 +374,7 @@ clustTrend <-
 					expr_sel <- expr_sel[, , order(as.numeric(dimnames(expr_sel)[[3]]))]
 					data_sel <- matrix(expr_sel, nrow=dim(expr_sel)[1], ncol=dim(expr_sel)[2]*dim(expr_sel)[3])
 					rownames(data_sel) <- dimnames(expr_sel)[[1]]
+					group.var <- group.var[order(TimePoint)] # watch out for the ordering
 					select_probe <- dimnames(expr_sel)[[1]]
 					if(!is.null(Group_ID_paired)){
 						Group_ID_paired <- Group_ID_paired[order(TimePoint)] # watch out for the ordering
@@ -368,20 +386,20 @@ clustTrend <-
 				data_stand_interest <- t(apply(X=data_sel[,group.var==group_of_interest], MARGIN=1, FUN=scale))
 				
 				if(is.null(Group_ID_paired)){
-					data_stand_ByTP_ref <- t(apply(X=data_stand_ref, MARGIN=1, FUN=Fun_byIndex, index=as.factor(TimePoint)[group.var==ref], fun=aggreg.fun))
-					data_stand_ByTP_interest <- t(apply(X=data_stand_interest, MARGIN=1, FUN=Fun_byIndex, index=as.factor(TimePoint)[group.var==group_of_interest], fun=aggreg.fun))                         
+					data_stand_ByTP_ref <- t(apply(X=data_stand_ref, MARGIN=1, FUN=Fun_byIndex, index=as.factor(TimePoint)[group.var==ref], fun=aggreg.fun, na.rm=na.rm.aggreg))
+					data_stand_ByTP_interest <- t(apply(X=data_stand_interest, MARGIN=1, FUN=Fun_byIndex, index=as.factor(TimePoint)[group.var==group_of_interest], fun=aggreg.fun, na.rm=na.rm.aggreg))                         
 					data_stand_ByTP <- data_stand_ByTP_interest-data_stand_ByTP_ref
 				}else{
 					data_stand <- t(apply(X=cbind.data.frame(data_stand_interest, -data_stand_ref), MARGIN=1, FUN=Fun_byIndex, 
 										  index=(as.factor(c(TimePoint[group.var==group_of_interest], TimePoint[group.var==ref])):as.factor(c(as.character(Group_ID_paired)[group.var==group_of_interest], as.character(Group_ID_paired)[group.var==ref]))),
 										  fun=sum))
-					data_stand_ByTP <- t(apply(X=data_stand, MARGIN=1, FUN=Fun_byIndex, index=sort(as.factor(TimePoint[group.var==group_of_interest])), fun=aggreg.fun))
+					data_stand_ByTP <- t(apply(X=data_stand, MARGIN=1, FUN=Fun_byIndex, index=sort(as.factor(TimePoint[group.var==group_of_interest])), fun=aggreg.fun, na.rm=na.rm.aggreg))
 				}
 			}
 			
 			if(sum(apply(data_stand_ByTP, MARGIN=2, FUN=var), na.rm = TRUE)<1.e-25){
 				nc <- 1
-				clust <- rep(1, dim(data_stand)[1])
+				clust <- rep(1, dim(data_stand_ByTP)[1])
 			} 
 			else{
 				kmax <- ifelse(dim(data_stand_ByTP)[1]>4, max_trends, dim(data_stand_ByTP)[1]-1)
@@ -397,7 +415,7 @@ clustTrend <-
 					}
 				}else{
 					nc <- 1
-					clust <- rep(1, dim(data_stand)[1])
+					clust <- rep(1, dim(data_stand_ByTP)[1])
 				}
 			}
 			medoids <- as.data.frame(t(apply(X=data_stand_ByTP, MARGIN=2, FUN=Fun_byIndex, index=clust, fun=trend.fun)))
