@@ -7,14 +7,32 @@
 \alias{plot.ClusteredTrends}
 \title{Cluster the genes dynamics into different dominant trends.}
 \usage{
-clustTrend(tcgs, expr, Subject_ID, TimePoint, threshold = 0.05,
-  myproc = "BY", nbsimu_pval = 1e+06, baseline = NULL,
-  only.signif = TRUE, group.var = NULL, Group_ID_paired = NULL,
-  ref = NULL, group_of_interest = NULL, FUNcluster = NULL,
-  clustering_metric = "euclidian", clustering_method = "ward",
-  B = 100, max_trends = 4, aggreg.fun = "median",
-  na.rm.aggreg = TRUE, trend.fun = "median",
-  methodOptiClust = "firstSEmax", indiv = "genes", verbose = TRUE)
+clustTrend(
+  tcgs,
+  expr,
+  Subject_ID,
+  TimePoint,
+  threshold = 0.05,
+  myproc = "BY",
+  nbsimu_pval = 1e+06,
+  baseline = NULL,
+  only.signif = TRUE,
+  group.var = NULL,
+  Group_ID_paired = NULL,
+  ref = NULL,
+  group_of_interest = NULL,
+  FUNcluster = NULL,
+  clustering_metric = "euclidian",
+  clustering_method = "ward",
+  B = 100,
+  max_trends = 4,
+  aggreg.fun = "median",
+  na.rm.aggreg = TRUE,
+  trend.fun = "median",
+  methodOptiClust = "firstSEmax",
+  indiv = "genes",
+  verbose = TRUE
+)
 
 \method{print}{ClusteredTrends}(x, ...)
 
@@ -193,7 +211,7 @@ clusters in the plotted gene set.  See
 }
 \examples{
 
-\dontrun{
+if(interactive()){
 data(data_simu_TcGSA)
 
 tcgsa_sim_1grp <- TcGSA.LR(expr=expr_1grp, gmt=gmt_sim, design=design, 

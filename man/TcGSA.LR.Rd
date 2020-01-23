@@ -6,11 +6,21 @@
 \alias{print.TcGSA}
 \title{Computing the Likelihood Ratios for the Gene Sets under Scrutiny}
 \usage{
-TcGSA.LR(expr, gmt, design, subject_name = "Patient_ID",
-  time_name = "TimePoint", crossedRandom = FALSE,
-  covariates_fixed = "", time_covariates = "", time_func = "linear",
-  group_name = "", separateSubjects = FALSE, minGSsize = 10,
-  maxGSsize = 500)
+TcGSA.LR(
+  expr,
+  gmt,
+  design,
+  subject_name = "Patient_ID",
+  time_name = "TimePoint",
+  crossedRandom = FALSE,
+  covariates_fixed = "",
+  time_covariates = "",
+  time_func = "linear",
+  group_name = "",
+  separateSubjects = FALSE,
+  minGSsize = 10,
+  maxGSsize = 500
+)
 
 \method{print}{TcGSA}(x, ...)
 }
@@ -133,7 +143,7 @@ have significantly different trends over time depending on \code{Subjects}.
 }
 \examples{
 
-\dontrun{ 
+if(interactive()){
 data(data_simu_TcGSA)
 
 tcgsa_sim_1grp <- TcGSA.LR(expr=expr_1grp, gmt=gmt_sim, design=design, 

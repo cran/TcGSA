@@ -4,11 +4,24 @@
 \alias{TcGSA.LR.parallel}
 \title{Parallel computing the Likelihood Ratios for the Gene Sets under Scrutiny}
 \usage{
-TcGSA.LR.parallel(Ncpus, type_connec, expr, gmt, design,
-  subject_name = "Patient_ID", time_name = "TimePoint",
-  crossedRandom = FALSE, covariates_fixed = "", time_covariates = "",
-  time_func = "linear", group_name = "", separateSubjects = FALSE,
-  minGSsize = 10, maxGSsize = 500, monitorfile = "")
+TcGSA.LR.parallel(
+  Ncpus,
+  type_connec,
+  expr,
+  gmt,
+  design,
+  subject_name = "Patient_ID",
+  time_name = "TimePoint",
+  crossedRandom = FALSE,
+  covariates_fixed = "",
+  time_covariates = "",
+  time_func = "linear",
+  group_name = "",
+  separateSubjects = FALSE,
+  minGSsize = 10,
+  maxGSsize = 500,
+  monitorfile = ""
+)
 }
 \arguments{
 \item{Ncpus}{The number of processors available.}
@@ -142,7 +155,7 @@ scrutiny has been analyzed (i.e. the two mixed models have been fitted, see
 }
 \examples{
                
-\dontrun{ 
+if(interactive()){
 data(data_simu_TcGSA)
 
 tcgsa_sim_1grp <- TcGSA.LR(expr=expr_1grp, gmt=gmt_sim, design=design, 

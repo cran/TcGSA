@@ -4,18 +4,48 @@
 \alias{plot1GS}
 \title{Plotting a Specific Gene Set}
 \usage{
-plot1GS(expr, gmt, Subject_ID, TimePoint, geneset.name, baseline = NULL,
-  group.var = NULL, Group_ID_paired = NULL, ref = NULL,
-  group_of_interest = NULL, FUNcluster = NULL,
-  clustering_metric = "euclidian", clustering_method = "ward",
-  B = 500, max_trends = 4, aggreg.fun = "median",
-  na.rm.aggreg = TRUE, trend.fun = "median",
-  methodOptiClust = "firstSEmax", indiv = "genes", verbose = TRUE,
-  clustering = TRUE, showTrend = TRUE, smooth = TRUE,
-  precluster = NULL, time_unit = "", title = NULL, y.lab = NULL,
-  desc = TRUE, lab.cex = 1, axis.cex = 1, main.cex = 1,
-  y.lab.angle = 90, x.axis.angle = 45, margins = 1, line.size = 1,
-  y.lim = NULL, x.lim = NULL, gg.add = list(theme()), plot = TRUE)
+plot1GS(
+  expr,
+  gmt,
+  Subject_ID,
+  TimePoint,
+  geneset.name,
+  baseline = NULL,
+  group.var = NULL,
+  Group_ID_paired = NULL,
+  ref = NULL,
+  group_of_interest = NULL,
+  FUNcluster = NULL,
+  clustering_metric = "euclidian",
+  clustering_method = "ward",
+  B = 500,
+  max_trends = 4,
+  aggreg.fun = "median",
+  na.rm.aggreg = TRUE,
+  trend.fun = "median",
+  methodOptiClust = "firstSEmax",
+  indiv = "genes",
+  verbose = TRUE,
+  clustering = TRUE,
+  showTrend = TRUE,
+  smooth = TRUE,
+  precluster = NULL,
+  time_unit = "",
+  title = NULL,
+  y.lab = NULL,
+  desc = TRUE,
+  lab.cex = 1,
+  axis.cex = 1,
+  main.cex = 1,
+  y.lab.angle = 90,
+  x.axis.angle = 45,
+  margins = 1,
+  line.size = 1,
+  y.lim = NULL,
+  x.lim = NULL,
+  gg.add = list(theme()),
+  plot = TRUE
+)
 }
 \arguments{
 \item{expr}{either a matrix or dataframe of gene expression upon which
@@ -238,7 +268,7 @@ clusters in the plotted gene set.  See
 }
 \examples{
 
-\dontrun{
+if(interactive()){
 data(data_simu_TcGSA)
 tcgsa_sim_1grp <- TcGSA.LR(expr=expr_1grp, gmt=gmt_sim, design=design, 
                           subject_name="Patient_ID", time_name="TimePoint",
@@ -258,18 +288,18 @@ plot1GS(expr=expr_1grp, TimePoint=design$TimePoint,
        time_unit="H",
        lab.cex=0.7)
 }
-\dontrun{        
+if(interactive()){      
 geneclusters <- plot1GS(expr=tcgsa_sim_1grp$Estimations, TimePoint=design$TimePoint, 
-Subject_ID=design$Patient_ID, gmt=gmt_sim,
-geneset.name="Gene set 5",
-indiv="genes",
-time_unit="H",
-lab.cex=0.7
+                       Subject_ID=design$Patient_ID, gmt=gmt_sim,
+                       geneset.name="Gene set 5",
+                       indiv="genes",
+                       time_unit="H",
+                       lab.cex=0.7
 )
 geneclusters
 }
 
-\dontrun{
+if(interactive()){
 library(grDevices)
 library(graphics)
 colval <- c(hsv(0.56, 0.9, 1),
@@ -300,6 +330,18 @@ plot1GS(expr=expr_1grp, TimePoint=design$TimePoint,
                    guides(colour = guide_legend(reverse=TRUE))),
        lab.cex=0.7
 )
+
+plot1GS(expr=expr_2grp, TimePoint=design$TimePoint, 
+       Subject_ID=design$Patient_ID, gmt=gmt_sim,
+       geneset.name="Gene set 3",
+       indiv="genes",
+       group.var = design$group.var,
+       time_unit="H",
+       gg.add=list(scale_color_manual(values=colval), 
+                   guides(colour = guide_legend(reverse=TRUE))),
+       lab.cex=0.7
+)
+
 }
 
 }

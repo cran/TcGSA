@@ -4,9 +4,16 @@
 \alias{signifLRT.TcGSA}
 \title{Identifying the Significant Gene Sets}
 \usage{
-signifLRT.TcGSA(tcgsa, threshold = 0.05, myproc = "BY",
-  nbsimu_pval = 1e+06, write = F, txtfilename = NULL,
-  directory = NULL, exact = TRUE)
+signifLRT.TcGSA(
+  tcgsa,
+  threshold = 0.05,
+  myproc = "BY",
+  nbsimu_pval = 1e+06,
+  write = F,
+  txtfilename = NULL,
+  directory = NULL,
+  exact = TRUE
+)
 }
 \arguments{
 \item{tcgsa}{a \code{tcgsa} object.}
@@ -68,7 +75,7 @@ A function that identifies the significant gene sets in an object of class
 '\code{TcGSA}'.
 }
 \examples{
-\dontrun{
+if(interactive()){
 data(data_simu_TcGSA)
 
 tcgsa_sim_1grp <- TcGSA.LR(expr=expr_1grp, gmt=gmt_sim, design=design, 
