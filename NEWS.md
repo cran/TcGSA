@@ -1,3 +1,6 @@
+# TcGSA 0.12.13
+* improved documentation with correct links for CRAN static html and update URLs
+
 # TcGSA 0.12.10
 * improved documentation
 

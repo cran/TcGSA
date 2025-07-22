@@ -30,7 +30,7 @@ design <- read.delim(gzfile("GSE46734/GSE46734_DALIA1longitudinalTranscriptome_D
 design_preATI <- design[-which(design$TimePoint<0 | design$TimePoint==16 | design$TimePoint>22), ]
 head(design_preATI,5)
 
-## ---- include=FALSE-----------------------------------------------------------
+## ----include=FALSE------------------------------------------------------------
 stopifnot(nrow(design_preATI)==90 & ncol(design_preATI)==6)
 
 ## ----expr_dalia, cache=TRUE---------------------------------------------------
@@ -40,7 +40,7 @@ expr_preATI <- expr_preATI[,as.character(design_preATI$Sample_name)]
 
 expr_preATI[1:4,1:4]
 
-## ---- include=FALSE-----------------------------------------------------------
+## ----include=FALSE------------------------------------------------------------
 stopifnot(nrow(expr_preATI)==32978 & ncol(expr_preATI)==90)
 
 ## ----dim_expr_DALIA-----------------------------------------------------------
@@ -84,7 +84,8 @@ TcGSA::plot1GS(expr = expr_preATI,
 			   ))
 
 ## ----import_ober, message=FALSE, warning=FALSE--------------------------------
-utils::download.file("ftp://ftp.ncbi.nlm.nih.gov/geo/series/GSE30nnn/GSE30101/soft/GSE30101_family.soft.gz", destfile = "GSE30101_family.soft.gz", mode = "wb", cacheOK = FALSE)
+utils::download.file("ftp://ftp.ncbi.nlm.nih.gov/geo/series/GSE30nnn/GSE30101/soft/GSE30101_family.soft.gz", 
+                     destfile = "GSE30101_family.soft.gz", mode = "wb", cacheOK = FALSE)
 gse.soft <- GEOquery::getGEO(filename="GSE30101_family.soft.gz")
 
 ## ----expr_ober----------------------------------------------------------------
@@ -207,10 +208,10 @@ plot(x=tcgsa_result_MT, expr=tcgsa_result_MT$Estimations,
 	 heatKey.size=0.8)
 
 ## ----dl_GEOquery, warning=FALSE, message=FALSE, eval=FALSE--------------------
-#  if (!requireNamespace("GEOquery", quietly = TRUE)) {
-#  	if (!requireNamespace("BiocManager", quietly = TRUE)){
-#  		install.packages("BiocManager")
-#  	}
-#  	BiocManager::install("GEOquery")
-#  }
+# if (!requireNamespace("GEOquery", quietly = TRUE)) {
+# 	if (!requireNamespace("BiocManager", quietly = TRUE)){
+# 		install.packages("BiocManager")
+# 	}
+# 	BiocManager::install("GEOquery")
+# }
 
